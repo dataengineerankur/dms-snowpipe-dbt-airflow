@@ -1,0 +1,13 @@
+snowflake_account            = "bwxzfgs-ma78810"
+snowflake_user               = "BOBBYDEOL"
+snowflake_password           = "Tata@8237552399"
+snowflake_role               = "ACCOUNTADMIN"
+
+database_name                = "ANALYTICS"
+
+s3_bucket_name               = "dms-snowpipe-dev-05d6e64a"
+storage_integration_role_arn = "arn:aws:iam::384177185145:role/dms-snowpipe-dev-snowflake-storage-role"
+
+ingest_wh_size               = "XSMALL"
+transform_wh_size            = "SMALL"
+
