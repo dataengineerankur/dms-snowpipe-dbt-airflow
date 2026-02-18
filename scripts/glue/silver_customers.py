@@ -41,6 +41,8 @@ def dedupe_latest(df, key_col, ts_cols):
     return df.withColumn("rn", F.row_number().over(w)).filter(F.col("rn") == 1).drop("rn")
 
 
+customers = read_raw("customers")
+
 op_col = F.col("dms_op") if "dms_op" in customers.columns else F.col("Op")
 customers = customers.filter((op_col.isNull()) | (op_col != "D"))
 customers = dedupe_latest(customers, "customer_id", ["dms_commit_ts", "DMS_COMMIT_TS", "updated_at", "created_at"])
