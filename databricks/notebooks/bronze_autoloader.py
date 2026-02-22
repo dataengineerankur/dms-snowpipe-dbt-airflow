@@ -7,6 +7,28 @@
 # COMMAND ----------
 
 from pyspark.sql import functions as F
+import os
+
+# COMMAND ----------
+
+spark.conf.set("spark.hadoop.fs.s3.aws.credentials.provider", "com.amazonaws.auth.InstanceProfileCredentialsProvider,com.amazonaws.auth.DefaultAWSCredentialsProviderChain")
+spark.conf.set("spark.hadoop.fs.s3a.aws.credentials.provider", "com.amazonaws.auth.InstanceProfileCredentialsProvider,com.amazonaws.auth.DefaultAWSCredentialsProviderChain")
+spark.conf.set("spark.hadoop.fs.s3n.aws.credentials.provider", "com.amazonaws.auth.InstanceProfileCredentialsProvider,com.amazonaws.auth.DefaultAWSCredentialsProviderChain")
+
+aws_access_key = os.environ.get("AWS_ACCESS_KEY_ID")
+aws_secret_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
+aws_session_token = os.environ.get("AWS_SESSION_TOKEN")
+
+if aws_access_key and aws_secret_key:
+    spark.conf.set("spark.hadoop.fs.s3.awsAccessKeyId", aws_access_key)
+    spark.conf.set("spark.hadoop.fs.s3.awsSecretAccessKey", aws_secret_key)
+    spark.conf.set("spark.hadoop.fs.s3a.access.key", aws_access_key)
+    spark.conf.set("spark.hadoop.fs.s3a.secret.key", aws_secret_key)
+    spark.conf.set("spark.hadoop.fs.s3n.awsAccessKeyId", aws_access_key)
+    spark.conf.set("spark.hadoop.fs.s3n.awsSecretAccessKey", aws_secret_key)
+    if aws_session_token:
+        spark.conf.set("spark.hadoop.fs.s3a.session.token", aws_session_token)
+        spark.conf.set("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.TemporaryAWSCredentialsProvider")
 
 # COMMAND ----------
 
