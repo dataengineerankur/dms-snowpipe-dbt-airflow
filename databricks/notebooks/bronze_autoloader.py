@@ -43,6 +43,7 @@ if domain not in domain_to_tables:
 
 tables = domain_to_tables[domain]
 
+spark.sql(f"USE CATALOG {catalog}")
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")
 
 # COMMAND ----------
