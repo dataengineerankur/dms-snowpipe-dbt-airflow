@@ -12,7 +12,7 @@ from pyspark.sql.window import Window
 
 # COMMAND ----------
 
-dbutils.widgets.text("catalog", "hive_metastore")
+dbutils.widgets.text("catalog", "main")
 dbutils.widgets.text("schema", "walmart_lakehouse")
 dbutils.widgets.text("domain", "customers")  # customers | products | orders
 dbutils.widgets.text("bucket", "dms-snowpipe-dev-05d6e64a")
@@ -30,6 +30,7 @@ if not silver_base_path:
 if domain not in {"customers", "products", "orders"}:
     raise ValueError(f"Unsupported domain: {domain}")
 
+spark.sql(f"USE CATALOG {catalog}")
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")
 
 
