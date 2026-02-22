@@ -13,7 +13,7 @@ from pyspark.sql import functions as F
 
 # COMMAND ----------
 
-dbutils.widgets.text("catalog", "main")
+dbutils.widgets.text("catalog", "hive_metastore")
 dbutils.widgets.text("schema", "walmart_lakehouse")
 dbutils.widgets.text("domain", "customers")  # customers | products | orders
 
