@@ -17,6 +17,10 @@ dbutils.widgets.text("bucket", "dms-snowpipe-dev-05d6e64a")
 dbutils.widgets.text("bronze_base_path", "")
 dbutils.widgets.text("checkpoint_base_path", "")
 dbutils.widgets.dropdown("include_existing_files", "true", ["true", "false"])
+dbutils.widgets.text("aws_secret_scope", "aws-credentials")
+dbutils.widgets.text("aws_access_key_name", "aws-access-key-id")
+dbutils.widgets.text("aws_secret_key_name", "aws-secret-access-key")
+dbutils.widgets.text("aws_session_token_name", "aws-session-token")
 
 catalog = dbutils.widgets.get("catalog")
 schema = dbutils.widgets.get("schema")
@@ -31,6 +35,29 @@ if not bronze_base_path:
     bronze_base_path = f"s3://{bucket}/databricks/bronze"
 if not checkpoint_base_path:
     checkpoint_base_path = f"s3://{bucket}/databricks/checkpoints/bronze"
+
+aws_secret_scope = dbutils.widgets.get("aws_secret_scope")
+aws_access_key_name = dbutils.widgets.get("aws_access_key_name")
+aws_secret_key_name = dbutils.widgets.get("aws_secret_key_name")
+aws_session_token_name = dbutils.widgets.get("aws_session_token_name")
+
+try:
+    aws_access_key = dbutils.secrets.get(scope=aws_secret_scope, key=aws_access_key_name)
+    aws_secret_key = dbutils.secrets.get(scope=aws_secret_scope, key=aws_secret_key_name)
+    
+    spark.conf.set("spark.hadoop.fs.s3a.access.key", aws_access_key)
+    spark.conf.set("spark.hadoop.fs.s3a.secret.key", aws_secret_key)
+    
+    try:
+        aws_session_token = dbutils.secrets.get(scope=aws_secret_scope, key=aws_session_token_name)
+        if aws_session_token:
+            spark.conf.set("spark.hadoop.fs.s3a.session.token", aws_session_token)
+            spark.conf.set("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.TemporaryAWSCredentialsProvider")
+    except Exception:
+        pass
+except Exception as e:
+    print(f"Warning: Could not configure AWS credentials from secret scope '{aws_secret_scope}': {e}")
+    print("Attempting to proceed with default credentials (instance profile or environment variables)")
 
 domain_to_tables = {
     "customers": ["customers"],
