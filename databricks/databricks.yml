@@ -16,6 +16,18 @@ variables:
   s3_bucket:
     description: S3 bucket containing DMS files
     default: dms-snowpipe-dev-05d6e64a
+  aws_secret_scope:
+    description: Databricks secret scope containing AWS credentials
+    default: aws_credentials
+  aws_access_key_name:
+    description: Secret key name for AWS access key ID
+    default: aws_access_key_id
+  aws_secret_key_name:
+    description: Secret key name for AWS secret access key
+    default: aws_secret_access_key
+  aws_session_token_name:
+    description: Secret key name for AWS session token (optional)
+    default: aws_session_token
 
 targets:
   dev:
