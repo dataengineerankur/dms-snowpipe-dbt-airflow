@@ -13,7 +13,7 @@ from pyspark.sql import functions as F
 
 # COMMAND ----------
 
-dbutils.widgets.text("catalog", "hive_metastore")
+dbutils.widgets.text("catalog", "main")
 dbutils.widgets.text("schema", "walmart_lakehouse")
 dbutils.widgets.text("domain", "customers")  # customers | products | orders
 
@@ -24,6 +24,7 @@ domain = dbutils.widgets.get("domain").strip().lower()
 if domain not in {"customers", "products", "orders"}:
     raise ValueError(f"Unsupported domain: {domain}")
 
+spark.sql(f"USE CATALOG {catalog}")
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")
 
 
