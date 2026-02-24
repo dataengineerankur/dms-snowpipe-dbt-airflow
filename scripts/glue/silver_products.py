@@ -30,7 +30,20 @@ today = F.date_format(F.current_date(), "yyyyMMdd")
 
 
 def read_raw(table):
-    return spark.read.parquet(f"s3://{bucket}/{raw_prefix}/sales/{table}/")
+    from pyspark.sql.types import StructType, StructField, StringType
+    
+    path = f"s3://{bucket}/{raw_prefix}/sales/{table}/"
+    try:
+        return spark.read.parquet(path)
+    except Exception as e:
+        print(f"Warning: Unable to read {path}: {e}. Returning empty DataFrame.")
+        # Return empty DataFrame with minimal schema
+        schema = StructType([
+            StructField("product_id", StringType(), True),
+            StructField("dms_op", StringType(), True),
+            StructField("Op", StringType(), True),
+        ])
+        return spark.createDataFrame([], schema)
 
 
 def dedupe_latest(df, key_col, ts_cols):
