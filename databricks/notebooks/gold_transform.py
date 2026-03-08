@@ -24,7 +24,11 @@ domain = dbutils.widgets.get("domain").strip().lower()
 if domain not in {"customers", "products", "orders"}:
     raise ValueError(f"Unsupported domain: {domain}")
 
-spark.sql(f"USE CATALOG {catalog}")
+try:
+    spark.sql(f"CREATE CATALOG IF NOT EXISTS {catalog}")
+    spark.sql(f"USE CATALOG {catalog}")
+except Exception:
+    pass
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")
 
 
