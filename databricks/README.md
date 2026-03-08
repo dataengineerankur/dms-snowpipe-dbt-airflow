@@ -31,6 +31,13 @@ Each workflow has 3 tasks:
 1. Cluster runtime:
    - Databricks Runtime 13.3+ (includes Delta + Auto Loader).
 2. IAM access from Databricks to S3 bucket `dms-snowpipe-dev-05d6e64a`.
+   - Configure AWS credentials in Databricks secrets:
+     ```bash
+     databricks secrets create-scope aws
+     databricks secrets put-secret aws access_key_id
+     databricks secrets put-secret aws secret_access_key
+     ```
+   - Alternatively, configure the cluster with an instance profile that has S3 access.
 3. Repo imported into Databricks Repos.
 4. Provide `cluster_id` when deploying bundle.
 

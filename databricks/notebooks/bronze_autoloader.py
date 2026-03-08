@@ -10,6 +10,26 @@ from pyspark.sql import functions as F
 
 # COMMAND ----------
 
+# Configure AWS credentials for S3 access
+try:
+    aws_access_key = dbutils.secrets.get(scope="aws", key="access_key_id")
+    aws_secret_key = dbutils.secrets.get(scope="aws", key="secret_access_key")
+    
+    spark.conf.set("fs.s3a.access.key", aws_access_key)
+    spark.conf.set("fs.s3a.secret.key", aws_secret_key)
+    spark.conf.set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+    spark.conf.set("fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider")
+    
+    spark.conf.set("fs.s3.access.key", aws_access_key)
+    spark.conf.set("fs.s3.secret.key", aws_secret_key)
+    spark.conf.set("fs.s3.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+    spark.conf.set("fs.s3.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider")
+except Exception as e:
+    print(f"Warning: Could not set AWS credentials from secrets: {e}")
+    print("Attempting to use instance profile or environment credentials")
+
+# COMMAND ----------
+
 dbutils.widgets.text("catalog", "main")
 dbutils.widgets.text("schema", "walmart_lakehouse")
 dbutils.widgets.text("domain", "customers")  # customers | products | orders
