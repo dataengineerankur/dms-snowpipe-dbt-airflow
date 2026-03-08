@@ -12,7 +12,7 @@ from pyspark.sql.window import Window
 
 # COMMAND ----------
 
-dbutils.widgets.text("catalog", "main")
+dbutils.widgets.text("catalog", "patchit")
 dbutils.widgets.text("schema", "walmart_lakehouse")
 dbutils.widgets.text("domain", "customers")  # customers | products | orders
 dbutils.widgets.text("bucket", "dms-snowpipe-dev-05d6e64a")
