@@ -262,6 +262,7 @@ def main() -> int:
             "glue_job_name": job_name,
             "glue_job_run_id": job_run_id,
             "glue_job_state": glue_state,
+            "run_status": glue_state,
             "glue_job_error": glue_error,
             "glue_job_args": glue_args,
             "sfn_error_context": sfn_error_context,
