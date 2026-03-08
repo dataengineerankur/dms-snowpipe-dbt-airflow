@@ -17,6 +17,10 @@ dbutils.widgets.text("schema", "walmart_lakehouse")
 dbutils.widgets.text("domain", "customers")  # customers | products | orders
 dbutils.widgets.text("bucket", "dms-snowpipe-dev-05d6e64a")
 dbutils.widgets.text("silver_base_path", "")
+dbutils.widgets.text("aws_secret_scope", "aws-credentials")
+dbutils.widgets.text("aws_access_key_name", "aws-access-key-id")
+dbutils.widgets.text("aws_secret_key_name", "aws-secret-access-key")
+dbutils.widgets.text("aws_session_token_name", "aws-session-token")
 
 catalog = dbutils.widgets.get("catalog")
 schema = dbutils.widgets.get("schema")
@@ -24,8 +28,33 @@ domain = dbutils.widgets.get("domain").strip().lower()
 bucket = dbutils.widgets.get("bucket")
 silver_base_path = dbutils.widgets.get("silver_base_path").strip()
 
+aws_secret_scope = dbutils.widgets.get("aws_secret_scope").strip()
+aws_access_key_name = dbutils.widgets.get("aws_access_key_name").strip()
+aws_secret_key_name = dbutils.widgets.get("aws_secret_key_name").strip()
+aws_session_token_name = dbutils.widgets.get("aws_session_token_name").strip()
+
 if not silver_base_path:
     silver_base_path = f"s3://{bucket}/databricks/silver"
+
+if aws_secret_scope:
+    try:
+        access_key = dbutils.secrets.get(scope=aws_secret_scope, key=aws_access_key_name)
+        secret_key = dbutils.secrets.get(scope=aws_secret_scope, key=aws_secret_key_name)
+        spark.conf.set("fs.s3a.access.key", access_key)
+        spark.conf.set("fs.s3a.secret.key", secret_key)
+        spark.conf.set("fs.s3.access.key", access_key)
+        spark.conf.set("fs.s3.secret.key", secret_key)
+        
+        if aws_session_token_name:
+            try:
+                session_token = dbutils.secrets.get(scope=aws_secret_scope, key=aws_session_token_name)
+                spark.conf.set("fs.s3a.session.token", session_token)
+                spark.conf.set("fs.s3.session.token", session_token)
+            except Exception:
+                pass
+    except Exception as e:
+        print(f"Warning: Could not configure AWS credentials: {e}")
+        print("Proceeding with default credentials (instance profile or environment)")
 
 if domain not in {"customers", "products", "orders"}:
     raise ValueError(f"Unsupported domain: {domain}")
