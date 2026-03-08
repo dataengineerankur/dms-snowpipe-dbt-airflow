@@ -110,6 +110,7 @@ def process_orders():
         "line_total", F.col("quantity") * F.col("unit_price")
     )
     latest_items = latest_cdc(items, ["order_item_id"])
+    silver_totals = latest_items.count()
     upsert_with_deletes(
         latest_items,
         f"{catalog}.{schema}.silver_order_items",
