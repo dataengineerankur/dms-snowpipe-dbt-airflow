@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 import boto3
+import requests
 
 
 DEFAULT_PATCHIT_INGEST_URL = "http://127.0.0.1:18088/events/ingest"
