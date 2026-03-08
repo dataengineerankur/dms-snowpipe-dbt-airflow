@@ -24,8 +24,18 @@ domain = dbutils.widgets.get("domain").strip().lower()
 if domain not in {"customers", "products", "orders"}:
     raise ValueError(f"Unsupported domain: {domain}")
 
-spark.sql(f"USE CATALOG {catalog}")
-spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")
+# Try to use the specified catalog, fall back to hive_metastore if it doesn't exist
+try:
+    spark.sql(f"USE CATALOG {catalog}")
+    spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")
+except Exception as e:
+    if "not found" in str(e).lower() or "does not exist" in str(e).lower():
+        print(f"Catalog '{catalog}' not found, falling back to hive_metastore")
+        catalog = "hive_metastore"
+        spark.sql(f"CREATE DATABASE IF NOT EXISTS {schema}")
+        spark.sql(f"USE {schema}")
+    else:
+        raise
 
 
 def table_exists(full_name: str) -> bool:
