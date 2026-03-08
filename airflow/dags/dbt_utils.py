@@ -65,3 +65,6 @@ def build_dbt_task(task_id: str, command: str):
         environment=DEFAULT_ENV,
         mount_tmp_dir=False,
     )
+
+
+run_dbt_model = build_dbt_task
