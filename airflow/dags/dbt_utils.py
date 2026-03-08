@@ -58,7 +58,7 @@ def build_dbt_task(task_id: str, command: str):
         task_id=task_id,
         image=os.getenv("DBT_IMAGE", "dms-dbt-runner:latest"),
         api_version="auto",
-        auto_remove=True,
+        auto_remove="success",
         command=docker_command,
         docker_url=os.getenv("DOCKER_HOST", "tcp://docker-proxy:2375"),
         network_mode="bridge",
