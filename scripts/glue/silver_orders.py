@@ -40,12 +40,13 @@ def dedupe_latest(df, key_col, ts_cols):
     w = Window.partitionBy(key_col).orderBy(*order_cols)
     return df.withColumn("rn", F.row_number().over(w)).filter(F.col("rn") == 1).drop("rn")
 
-
+orders = read_raw("orders")
 op_col_orders = F.col("dms_op") if "dms_op" in orders.columns else F.col("Op")
 orders = orders.filter((op_col_orders.isNull()) | (op_col_orders != "D"))
 orders = dedupe_latest(orders, "order_id", ["dms_commit_ts", "DMS_COMMIT_TS", "updated_at", "order_date"])
 orders = orders.withColumn("load_dt", today)
 
+order_items = read_raw("order_items")
 op_col_items = F.col("dms_op") if "dms_op" in order_items.columns else F.col("Op")
 order_items = order_items.filter((op_col_items.isNull()) | (op_col_items != "D"))
 order_items = dedupe_latest(
