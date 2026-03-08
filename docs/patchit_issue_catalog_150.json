@@ -1,0 +1,1202 @@
+[
+  {
+    "id": "AF001",
+    "platform": "airflow",
+    "title": "Missing PK in source table",
+    "category": "data_quality",
+    "description": "primary key null or duplicated in upstream extract",
+    "pipeline_name": "patchit_airflow_issue_001"
+  },
+  {
+    "id": "AF002",
+    "platform": "airflow",
+    "title": "Unexpected null surge in critical column",
+    "category": "data_quality",
+    "description": "null ratio exceeds threshold after source deployment",
+    "pipeline_name": "patchit_airflow_issue_002"
+  },
+  {
+    "id": "AF003",
+    "platform": "airflow",
+    "title": "Referential integrity break",
+    "category": "data_quality",
+    "description": "foreign keys point to non-existent dimension rows",
+    "pipeline_name": "patchit_airflow_issue_003"
+  },
+  {
+    "id": "AF004",
+    "platform": "airflow",
+    "title": "Duplicate event ingestion",
+    "category": "ingestion",
+    "description": "dedupe key changed causing duplicate load",
+    "pipeline_name": "patchit_airflow_issue_004"
+  },
+  {
+    "id": "AF005",
+    "platform": "airflow",
+    "title": "Late arriving dimension causes fact mismatch",
+    "category": "timeliness",
+    "description": "fact arrives before dimension in SLA window",
+    "pipeline_name": "patchit_airflow_issue_005"
+  },
+  {
+    "id": "AF006",
+    "platform": "airflow",
+    "title": "Timezone skew between sources",
+    "category": "transformation",
+    "description": "UTC/local conversion mismatch creates date drift",
+    "pipeline_name": "patchit_airflow_issue_006"
+  },
+  {
+    "id": "AF007",
+    "platform": "airflow",
+    "title": "Schema drift new nullable column",
+    "category": "schema",
+    "description": "new column appears and transform silently drops it",
+    "pipeline_name": "patchit_airflow_issue_007"
+  },
+  {
+    "id": "AF008",
+    "platform": "airflow",
+    "title": "Schema drift changed data type",
+    "category": "schema",
+    "description": "integer changed to string in upstream payload",
+    "pipeline_name": "patchit_airflow_issue_008"
+  },
+  {
+    "id": "AF009",
+    "platform": "airflow",
+    "title": "Schema mismatch with contract",
+    "category": "schema",
+    "description": "producer schema version differs from consumer expectation",
+    "pipeline_name": "patchit_airflow_issue_009"
+  },
+  {
+    "id": "AF010",
+    "platform": "airflow",
+    "title": "Schema unavailable from registry",
+    "category": "schema",
+    "description": "schema registry timeout/unavailable",
+    "pipeline_name": "patchit_airflow_issue_010"
+  },
+  {
+    "id": "AF011",
+    "platform": "airflow",
+    "title": "Missing source partition",
+    "category": "ingestion",
+    "description": "expected partition path does not exist",
+    "pipeline_name": "patchit_airflow_issue_011"
+  },
+  {
+    "id": "AF012",
+    "platform": "airflow",
+    "title": "Truncated file in landing zone",
+    "category": "ingestion",
+    "description": "partial file upload due to network interruption",
+    "pipeline_name": "patchit_airflow_issue_012"
+  },
+  {
+    "id": "AF013",
+    "platform": "airflow",
+    "title": "Compressed file corrupt",
+    "category": "ingestion",
+    "description": "gzip archive unreadable",
+    "pipeline_name": "patchit_airflow_issue_013"
+  },
+  {
+    "id": "AF014",
+    "platform": "airflow",
+    "title": "CSV delimiter changed",
+    "category": "ingestion",
+    "description": "source switched delimiter without notice",
+    "pipeline_name": "patchit_airflow_issue_014"
+  },
+  {
+    "id": "AF015",
+    "platform": "airflow",
+    "title": "Header row missing",
+    "category": "ingestion",
+    "description": "extract produced data rows without column headers",
+    "pipeline_name": "patchit_airflow_issue_015"
+  },
+  {
+    "id": "AF016",
+    "platform": "airflow",
+    "title": "SCD2 overlap windows",
+    "category": "modeling",
+    "description": "effective_from/effective_to overlap for same natural key",
+    "pipeline_name": "patchit_airflow_issue_016"
+  },
+  {
+    "id": "AF017",
+    "platform": "airflow",
+    "title": "SCD2 open record duplication",
+    "category": "modeling",
+    "description": "multiple current records flagged active",
+    "pipeline_name": "patchit_airflow_issue_017"
+  },
+  {
+    "id": "AF018",
+    "platform": "airflow",
+    "title": "CDC missing delete events",
+    "category": "cdc",
+    "description": "delete ops not emitted by connector",
+    "pipeline_name": "patchit_airflow_issue_018"
+  },
+  {
+    "id": "AF019",
+    "platform": "airflow",
+    "title": "CDC out-of-order events",
+    "category": "cdc",
+    "description": "update before insert due to lag/replay",
+    "pipeline_name": "patchit_airflow_issue_019"
+  },
+  {
+    "id": "AF020",
+    "platform": "airflow",
+    "title": "CDC LSN gap detected",
+    "category": "cdc",
+    "description": "binlog offset skipped during failover",
+    "pipeline_name": "patchit_airflow_issue_020"
+  },
+  {
+    "id": "AF021",
+    "platform": "airflow",
+    "title": "Upstream job unavailable hard dependency",
+    "category": "orchestration",
+    "description": "upstream DAG failed and downstream still triggered",
+    "pipeline_name": "patchit_airflow_issue_021"
+  },
+  {
+    "id": "AF022",
+    "platform": "airflow",
+    "title": "Upstream job delayed soft dependency",
+    "category": "orchestration",
+    "description": "upstream completed but beyond downstream freshness SLA",
+    "pipeline_name": "patchit_airflow_issue_022"
+  },
+  {
+    "id": "AF023",
+    "platform": "airflow",
+    "title": "Circular dependency in DAG graph",
+    "category": "orchestration",
+    "description": "new dependency introduces cycle",
+    "pipeline_name": "patchit_airflow_issue_023"
+  },
+  {
+    "id": "AF024",
+    "platform": "airflow",
+    "title": "Deadlock on warehouse table lock",
+    "category": "runtime",
+    "description": "concurrent merge operations deadlock",
+    "pipeline_name": "patchit_airflow_issue_024"
+  },
+  {
+    "id": "AF025",
+    "platform": "airflow",
+    "title": "OOM during Spark transform",
+    "category": "runtime",
+    "description": "executor memory exhausted on skewed join",
+    "pipeline_name": "patchit_airflow_issue_025"
+  },
+  {
+    "id": "AF026",
+    "platform": "airflow",
+    "title": "Driver OOM from collect() misuse",
+    "category": "runtime",
+    "description": "collect loads full dataset to driver",
+    "pipeline_name": "patchit_airflow_issue_026"
+  },
+  {
+    "id": "AF027",
+    "platform": "airflow",
+    "title": "Shuffle spill saturation",
+    "category": "runtime",
+    "description": "insufficient disk for shuffle spill",
+    "pipeline_name": "patchit_airflow_issue_027"
+  },
+  {
+    "id": "AF028",
+    "platform": "airflow",
+    "title": "Skewed key causes long tail tasks",
+    "category": "runtime",
+    "description": "single hot key dominates partition",
+    "pipeline_name": "patchit_airflow_issue_028"
+  },
+  {
+    "id": "AF029",
+    "platform": "airflow",
+    "title": "Broadcast join threshold misconfigured",
+    "category": "runtime",
+    "description": "broadcast too large causing executor crash",
+    "pipeline_name": "patchit_airflow_issue_029"
+  },
+  {
+    "id": "AF030",
+    "platform": "airflow",
+    "title": "NullPointerException in UDF",
+    "category": "code",
+    "description": "UDF does not guard null input",
+    "pipeline_name": "patchit_airflow_issue_030"
+  },
+  {
+    "id": "AF031",
+    "platform": "airflow",
+    "title": "TypeError in Python transform",
+    "category": "code",
+    "description": "string concatenated with integer",
+    "pipeline_name": "patchit_airflow_issue_031"
+  },
+  {
+    "id": "AF032",
+    "platform": "airflow",
+    "title": "ImportError missing dependency",
+    "category": "code",
+    "description": "new library not installed in runtime image",
+    "pipeline_name": "patchit_airflow_issue_032"
+  },
+  {
+    "id": "AF033",
+    "platform": "airflow",
+    "title": "Runtime version mismatch",
+    "category": "code",
+    "description": "python/spark version incompatible with package",
+    "pipeline_name": "patchit_airflow_issue_033"
+  },
+  {
+    "id": "AF034",
+    "platform": "airflow",
+    "title": "Task retry storm due non-idempotent writes",
+    "category": "reliability",
+    "description": "retry duplicates side effects",
+    "pipeline_name": "patchit_airflow_issue_034"
+  },
+  {
+    "id": "AF035",
+    "platform": "airflow",
+    "title": "Idempotency key missing",
+    "category": "reliability",
+    "description": "same batch reprocessed creates duplicate facts",
+    "pipeline_name": "patchit_airflow_issue_035"
+  },
+  {
+    "id": "AF036",
+    "platform": "airflow",
+    "title": "Checkpoint corruption",
+    "category": "streaming",
+    "description": "stream checkpoint directory corrupted",
+    "pipeline_name": "patchit_airflow_issue_036"
+  },
+  {
+    "id": "AF037",
+    "platform": "airflow",
+    "title": "Offset commit failure",
+    "category": "streaming",
+    "description": "consumer cannot commit offsets",
+    "pipeline_name": "patchit_airflow_issue_037"
+  },
+  {
+    "id": "AF038",
+    "platform": "airflow",
+    "title": "Kafka topic retention too low",
+    "category": "streaming",
+    "description": "events expired before consumption",
+    "pipeline_name": "patchit_airflow_issue_038"
+  },
+  {
+    "id": "AF039",
+    "platform": "airflow",
+    "title": "Poison pill record blocks stream",
+    "category": "streaming",
+    "description": "single malformed message crashes microbatch",
+    "pipeline_name": "patchit_airflow_issue_039"
+  },
+  {
+    "id": "AF040",
+    "platform": "airflow",
+    "title": "Secrets retrieval failure",
+    "category": "platform",
+    "description": "vault token expired",
+    "pipeline_name": "patchit_airflow_issue_040"
+  },
+  {
+    "id": "AF041",
+    "platform": "airflow",
+    "title": "Expired cloud credentials",
+    "category": "platform",
+    "description": "temporary IAM creds expired mid-run",
+    "pipeline_name": "patchit_airflow_issue_041"
+  },
+  {
+    "id": "AF042",
+    "platform": "airflow",
+    "title": "Permission denied on object store path",
+    "category": "platform",
+    "description": "missing read ACL on landing bucket",
+    "pipeline_name": "patchit_airflow_issue_042"
+  },
+  {
+    "id": "AF043",
+    "platform": "airflow",
+    "title": "Permission denied on warehouse schema",
+    "category": "platform",
+    "description": "role lacks USAGE/CREATE rights",
+    "pipeline_name": "patchit_airflow_issue_043"
+  },
+  {
+    "id": "AF044",
+    "platform": "airflow",
+    "title": "Network egress blocked to API source",
+    "category": "platform",
+    "description": "firewall rule blocks source endpoint",
+    "pipeline_name": "patchit_airflow_issue_044"
+  },
+  {
+    "id": "AF045",
+    "platform": "airflow",
+    "title": "DNS resolution failure for source host",
+    "category": "platform",
+    "description": "private DNS outage",
+    "pipeline_name": "patchit_airflow_issue_045"
+  },
+  {
+    "id": "AF046",
+    "platform": "airflow",
+    "title": "TLS certificate expired upstream API",
+    "category": "platform",
+    "description": "HTTPS handshake fails",
+    "pipeline_name": "patchit_airflow_issue_046"
+  },
+  {
+    "id": "AF047",
+    "platform": "airflow",
+    "title": "API rate limit exceeded",
+    "category": "ingestion",
+    "description": "429 from source API",
+    "pipeline_name": "patchit_airflow_issue_047"
+  },
+  {
+    "id": "AF048",
+    "platform": "airflow",
+    "title": "Pagination bug skips records",
+    "category": "ingestion",
+    "description": "cursor handling drops middle page",
+    "pipeline_name": "patchit_airflow_issue_048"
+  },
+  {
+    "id": "AF049",
+    "platform": "airflow",
+    "title": "Incremental watermark not persisted",
+    "category": "ingestion",
+    "description": "state store write failed causing full reload",
+    "pipeline_name": "patchit_airflow_issue_049"
+  },
+  {
+    "id": "AF050",
+    "platform": "airflow",
+    "title": "Watermark timezone mismatch",
+    "category": "ingestion",
+    "description": "last_processed uses local time not UTC",
+    "pipeline_name": "patchit_airflow_issue_050"
+  },
+  {
+    "id": "AF051",
+    "platform": "airflow",
+    "title": "Backfill overlaps with daily load",
+    "category": "orchestration",
+    "description": "same date range loaded by two jobs",
+    "pipeline_name": "patchit_airflow_issue_051"
+  },
+  {
+    "id": "AF052",
+    "platform": "airflow",
+    "title": "Hardcoded environment path",
+    "category": "code",
+    "description": "job points to dev bucket in prod",
+    "pipeline_name": "patchit_airflow_issue_052"
+  },
+  {
+    "id": "AF053",
+    "platform": "airflow",
+    "title": "Configuration key missing",
+    "category": "code",
+    "description": "required config absent in env",
+    "pipeline_name": "patchit_airflow_issue_053"
+  },
+  {
+    "id": "AF054",
+    "platform": "airflow",
+    "title": "YAML parse error in pipeline config",
+    "category": "code",
+    "description": "invalid config syntax",
+    "pipeline_name": "patchit_airflow_issue_054"
+  },
+  {
+    "id": "AF055",
+    "platform": "airflow",
+    "title": "Feature flag enabled without migration",
+    "category": "release",
+    "description": "code path references absent table",
+    "pipeline_name": "patchit_airflow_issue_055"
+  },
+  {
+    "id": "AF056",
+    "platform": "airflow",
+    "title": "Incorrect join condition duplicates rows",
+    "category": "transformation",
+    "description": "many-to-many join unintended",
+    "pipeline_name": "patchit_airflow_issue_056"
+  },
+  {
+    "id": "AF057",
+    "platform": "airflow",
+    "title": "Window function partition bug",
+    "category": "transformation",
+    "description": "partition key omitted",
+    "pipeline_name": "patchit_airflow_issue_057"
+  },
+  {
+    "id": "AF058",
+    "platform": "airflow",
+    "title": "Incorrect dedupe ordering",
+    "category": "transformation",
+    "description": "old record chosen as latest",
+    "pipeline_name": "patchit_airflow_issue_058"
+  },
+  {
+    "id": "AF059",
+    "platform": "airflow",
+    "title": "Currency conversion table stale",
+    "category": "data_quality",
+    "description": "fx table not refreshed",
+    "pipeline_name": "patchit_airflow_issue_059"
+  },
+  {
+    "id": "AF060",
+    "platform": "airflow",
+    "title": "Business calendar mismatch",
+    "category": "data_quality",
+    "description": "holiday calendar outdated",
+    "pipeline_name": "patchit_airflow_issue_060"
+  },
+  {
+    "id": "AF061",
+    "platform": "airflow",
+    "title": "PII masking regression",
+    "category": "governance",
+    "description": "sensitive columns no longer masked",
+    "pipeline_name": "patchit_airflow_issue_061"
+  },
+  {
+    "id": "AF062",
+    "platform": "airflow",
+    "title": "GDPR delete request not propagated",
+    "category": "governance",
+    "description": "subject delete not applied downstream",
+    "pipeline_name": "patchit_airflow_issue_062"
+  },
+  {
+    "id": "AF063",
+    "platform": "airflow",
+    "title": "Data contract violation field removed",
+    "category": "contract",
+    "description": "producer removed mandatory field",
+    "pipeline_name": "patchit_airflow_issue_063"
+  },
+  {
+    "id": "AF064",
+    "platform": "airflow",
+    "title": "Data contract violation semantic change",
+    "category": "contract",
+    "description": "same field now different meaning",
+    "pipeline_name": "patchit_airflow_issue_064"
+  },
+  {
+    "id": "AF065",
+    "platform": "airflow",
+    "title": "Metric definition drift",
+    "category": "semantic",
+    "description": "KPI SQL changed without versioning",
+    "pipeline_name": "patchit_airflow_issue_065"
+  },
+  {
+    "id": "AF066",
+    "platform": "airflow",
+    "title": "Dimension surrogate key collision",
+    "category": "modeling",
+    "description": "key generator reset after restart",
+    "pipeline_name": "patchit_airflow_issue_066"
+  },
+  {
+    "id": "AF067",
+    "platform": "airflow",
+    "title": "Surrogate key negative overflow",
+    "category": "modeling",
+    "description": "integer overflow in key generation",
+    "pipeline_name": "patchit_airflow_issue_067"
+  },
+  {
+    "id": "AF068",
+    "platform": "airflow",
+    "title": "Fact grain violation",
+    "category": "modeling",
+    "description": "fact table contains mixed grains",
+    "pipeline_name": "patchit_airflow_issue_068"
+  },
+  {
+    "id": "AF069",
+    "platform": "airflow",
+    "title": "Snapshot not aligned to source cutoff",
+    "category": "timeliness",
+    "description": "snapshot captured mid-transaction",
+    "pipeline_name": "patchit_airflow_issue_069"
+  },
+  {
+    "id": "AF070",
+    "platform": "airflow",
+    "title": "Merge statement updates wrong rows",
+    "category": "warehouse",
+    "description": "merge ON clause missing predicate",
+    "pipeline_name": "patchit_airflow_issue_070"
+  },
+  {
+    "id": "AF071",
+    "platform": "airflow",
+    "title": "Delete without where clause safeguard",
+    "category": "warehouse",
+    "description": "full table accidental delete",
+    "pipeline_name": "patchit_airflow_issue_071"
+  },
+  {
+    "id": "AF072",
+    "platform": "airflow",
+    "title": "Long-running query timeout",
+    "category": "warehouse",
+    "description": "warehouse timeout threshold exceeded",
+    "pipeline_name": "patchit_airflow_issue_072"
+  },
+  {
+    "id": "AF073",
+    "platform": "airflow",
+    "title": "Warehouse suspended mid-job",
+    "category": "warehouse",
+    "description": "compute auto-suspend too aggressive",
+    "pipeline_name": "patchit_airflow_issue_073"
+  },
+  {
+    "id": "AF074",
+    "platform": "airflow",
+    "title": "Temp table name collision",
+    "category": "warehouse",
+    "description": "parallel runs share static temp table name",
+    "pipeline_name": "patchit_airflow_issue_074"
+  },
+  {
+    "id": "AF075",
+    "platform": "airflow",
+    "title": "Case sensitivity mismatch on column names",
+    "category": "schema",
+    "description": "quoted identifiers break transform",
+    "pipeline_name": "patchit_airflow_issue_075"
+  },
+  {
+    "id": "AF076",
+    "platform": "airflow",
+    "title": "UTF-8 decoding error in source file",
+    "category": "ingestion",
+    "description": "unexpected encoding cp1252",
+    "pipeline_name": "patchit_airflow_issue_076"
+  },
+  {
+    "id": "AF077",
+    "platform": "airflow",
+    "title": "JSON path missing nested field",
+    "category": "ingestion",
+    "description": "payload shape changed",
+    "pipeline_name": "patchit_airflow_issue_077"
+  },
+  {
+    "id": "AF078",
+    "platform": "airflow",
+    "title": "Array explosion cardinality blowup",
+    "category": "transformation",
+    "description": "explode creates huge intermediate rows",
+    "pipeline_name": "patchit_airflow_issue_078"
+  },
+  {
+    "id": "AF079",
+    "platform": "airflow",
+    "title": "Cross join accidentally introduced",
+    "category": "transformation",
+    "description": "missing join predicate",
+    "pipeline_name": "patchit_airflow_issue_079"
+  },
+  {
+    "id": "AF080",
+    "platform": "airflow",
+    "title": "Row-level security policy blocks job",
+    "category": "governance",
+    "description": "service role sees zero rows",
+    "pipeline_name": "patchit_airflow_issue_080"
+  },
+  {
+    "id": "AF081",
+    "platform": "airflow",
+    "title": "Airflow queue saturation",
+    "category": "orchestration",
+    "description": "executor slots exhausted",
+    "pipeline_name": "patchit_airflow_issue_081"
+  },
+  {
+    "id": "AF082",
+    "platform": "airflow",
+    "title": "Zombie task after worker restart",
+    "category": "orchestration",
+    "description": "state says running but process dead",
+    "pipeline_name": "patchit_airflow_issue_082"
+  },
+  {
+    "id": "AF083",
+    "platform": "airflow",
+    "title": "Scheduler lag from too many DAG parses",
+    "category": "orchestration",
+    "description": "parsing overhead delays scheduling",
+    "pipeline_name": "patchit_airflow_issue_083"
+  },
+  {
+    "id": "AF084",
+    "platform": "airflow",
+    "title": "Task heartbeat timeout",
+    "category": "orchestration",
+    "description": "worker network blip",
+    "pipeline_name": "patchit_airflow_issue_084"
+  },
+  {
+    "id": "AF085",
+    "platform": "airflow",
+    "title": "Incorrect retry delay exponential overflow",
+    "category": "orchestration",
+    "description": "retry delay computed too high",
+    "pipeline_name": "patchit_airflow_issue_085"
+  },
+  {
+    "id": "AF086",
+    "platform": "airflow",
+    "title": "SLA miss not alerting",
+    "category": "observability",
+    "description": "SLA callback misconfigured",
+    "pipeline_name": "patchit_airflow_issue_086"
+  },
+  {
+    "id": "AF087",
+    "platform": "airflow",
+    "title": "Alert flood duplicate incidents",
+    "category": "observability",
+    "description": "same root cause opens many incidents",
+    "pipeline_name": "patchit_airflow_issue_087"
+  },
+  {
+    "id": "AF088",
+    "platform": "airflow",
+    "title": "Log retention too short for RCA",
+    "category": "observability",
+    "description": "logs deleted before investigation",
+    "pipeline_name": "patchit_airflow_issue_088"
+  },
+  {
+    "id": "AF089",
+    "platform": "airflow",
+    "title": "Trace context lost across tasks",
+    "category": "observability",
+    "description": "correlation id not propagated",
+    "pipeline_name": "patchit_airflow_issue_089"
+  },
+  {
+    "id": "AF090",
+    "platform": "airflow",
+    "title": "Upstream API returns partial success",
+    "category": "integration",
+    "description": "200 response with failed records",
+    "pipeline_name": "patchit_airflow_issue_090"
+  },
+  {
+    "id": "AF091",
+    "platform": "airflow",
+    "title": "Webhook callback not idempotent",
+    "category": "integration",
+    "description": "duplicate callbacks create double processing",
+    "pipeline_name": "patchit_airflow_issue_091"
+  },
+  {
+    "id": "AF092",
+    "platform": "airflow",
+    "title": "External dependency maintenance window",
+    "category": "integration",
+    "description": "third-party service unavailable",
+    "pipeline_name": "patchit_airflow_issue_092"
+  },
+  {
+    "id": "AF093",
+    "platform": "airflow",
+    "title": "Container image pull failure",
+    "category": "platform",
+    "description": "registry auth/token issue",
+    "pipeline_name": "patchit_airflow_issue_093"
+  },
+  {
+    "id": "AF094",
+    "platform": "airflow",
+    "title": "Disk full on worker node",
+    "category": "platform",
+    "description": "local temp storage exhausted",
+    "pipeline_name": "patchit_airflow_issue_094"
+  },
+  {
+    "id": "AF095",
+    "platform": "airflow",
+    "title": "Clock skew between nodes",
+    "category": "platform",
+    "description": "token validation fails due time drift",
+    "pipeline_name": "patchit_airflow_issue_095"
+  },
+  {
+    "id": "AF096",
+    "platform": "airflow",
+    "title": "KMS decryption failure",
+    "category": "platform",
+    "description": "wrong key alias or revoked policy",
+    "pipeline_name": "patchit_airflow_issue_096"
+  },
+  {
+    "id": "AF097",
+    "platform": "airflow",
+    "title": "Orphaned staging files after failure",
+    "category": "reliability",
+    "description": "cleanup task skipped on exception",
+    "pipeline_name": "patchit_airflow_issue_097"
+  },
+  {
+    "id": "AF098",
+    "platform": "airflow",
+    "title": "Compaction job skipped causing file explosion",
+    "category": "reliability",
+    "description": "small file problem degrades query",
+    "pipeline_name": "patchit_airflow_issue_098"
+  },
+  {
+    "id": "AF099",
+    "platform": "airflow",
+    "title": "Rollback script incompatible with latest schema",
+    "category": "release",
+    "description": "rollback cannot run after migration",
+    "pipeline_name": "patchit_airflow_issue_099"
+  },
+  {
+    "id": "AF100",
+    "platform": "airflow",
+    "title": "Canary check ignored before full rollout",
+    "category": "release",
+    "description": "bad change promoted to all pipelines",
+    "pipeline_name": "patchit_airflow_issue_100"
+  },
+  {
+    "id": "SF001",
+    "platform": "snowflake",
+    "title": "Warehouse not available",
+    "category": "warehouse",
+    "description": "configured virtual warehouse does not exist",
+    "pipeline_name": "patchit_snowflake_issue_001"
+  },
+  {
+    "id": "SF002",
+    "platform": "snowflake",
+    "title": "Role missing privilege",
+    "category": "security",
+    "description": "role lacks USAGE on database",
+    "pipeline_name": "patchit_snowflake_issue_002"
+  },
+  {
+    "id": "SF003",
+    "platform": "snowflake",
+    "title": "Schema drift in staged files",
+    "category": "schema",
+    "description": "COPY INTO fails due column mismatch",
+    "pipeline_name": "patchit_snowflake_issue_003"
+  },
+  {
+    "id": "SF004",
+    "platform": "snowflake",
+    "title": "Stage credentials expired",
+    "category": "security",
+    "description": "external stage integration token expired",
+    "pipeline_name": "patchit_snowflake_issue_004"
+  },
+  {
+    "id": "SF005",
+    "platform": "snowflake",
+    "title": "File format mismatch",
+    "category": "ingestion",
+    "description": "CSV quoted fields parsed incorrectly",
+    "pipeline_name": "patchit_snowflake_issue_005"
+  },
+  {
+    "id": "SF006",
+    "platform": "snowflake",
+    "title": "Task suspended unexpectedly",
+    "category": "orchestration",
+    "description": "root task disabled",
+    "pipeline_name": "patchit_snowflake_issue_006"
+  },
+  {
+    "id": "SF007",
+    "platform": "snowflake",
+    "title": "Task dependency broken",
+    "category": "orchestration",
+    "description": "AFTER references dropped task",
+    "pipeline_name": "patchit_snowflake_issue_007"
+  },
+  {
+    "id": "SF008",
+    "platform": "snowflake",
+    "title": "Stream stale",
+    "category": "cdc",
+    "description": "stream offset aged out",
+    "pipeline_name": "patchit_snowflake_issue_008"
+  },
+  {
+    "id": "SF009",
+    "platform": "snowflake",
+    "title": "Merge duplicates due ON condition",
+    "category": "modeling",
+    "description": "upsert key incomplete",
+    "pipeline_name": "patchit_snowflake_issue_009"
+  },
+  {
+    "id": "SF010",
+    "platform": "snowflake",
+    "title": "Primary key not enforced logically",
+    "category": "data_quality",
+    "description": "duplicates in business key",
+    "pipeline_name": "patchit_snowflake_issue_010"
+  },
+  {
+    "id": "SF011",
+    "platform": "snowflake",
+    "title": "Null in not-null business field",
+    "category": "data_quality",
+    "description": "upstream null spikes",
+    "pipeline_name": "patchit_snowflake_issue_011"
+  },
+  {
+    "id": "SF012",
+    "platform": "snowflake",
+    "title": "Numeric overflow on cast",
+    "category": "transformation",
+    "description": "value exceeds target precision",
+    "pipeline_name": "patchit_snowflake_issue_012"
+  },
+  {
+    "id": "SF013",
+    "platform": "snowflake",
+    "title": "Invalid UTF8 in VARIANT",
+    "category": "ingestion",
+    "description": "JSON parser failure",
+    "pipeline_name": "patchit_snowflake_issue_013"
+  },
+  {
+    "id": "SF014",
+    "platform": "snowflake",
+    "title": "Timezone conversion bug",
+    "category": "transformation",
+    "description": "timestamp_ntz interpreted as local",
+    "pipeline_name": "patchit_snowflake_issue_014"
+  },
+  {
+    "id": "SF015",
+    "platform": "snowflake",
+    "title": "SCD2 close/open bug",
+    "category": "modeling",
+    "description": "current flag set on multiple rows",
+    "pipeline_name": "patchit_snowflake_issue_015"
+  },
+  {
+    "id": "SF016",
+    "platform": "snowflake",
+    "title": "CDC delete tombstone ignored",
+    "category": "cdc",
+    "description": "delete op filtered out",
+    "pipeline_name": "patchit_snowflake_issue_016"
+  },
+  {
+    "id": "SF017",
+    "platform": "snowflake",
+    "title": "Stage path missing daily folder",
+    "category": "ingestion",
+    "description": "date partition absent",
+    "pipeline_name": "patchit_snowflake_issue_017"
+  },
+  {
+    "id": "SF018",
+    "platform": "snowflake",
+    "title": "Network policy blocks connector",
+    "category": "platform",
+    "description": "client IP not allowed",
+    "pipeline_name": "patchit_snowflake_issue_018"
+  },
+  {
+    "id": "SF019",
+    "platform": "snowflake",
+    "title": "Masking policy regression",
+    "category": "governance",
+    "description": "sensitive data exposed",
+    "pipeline_name": "patchit_snowflake_issue_019"
+  },
+  {
+    "id": "SF020",
+    "platform": "snowflake",
+    "title": "Row access policy filters all rows",
+    "category": "governance",
+    "description": "service role sees empty dataset",
+    "pipeline_name": "patchit_snowflake_issue_020"
+  },
+  {
+    "id": "SF021",
+    "platform": "snowflake",
+    "title": "Long running query timeout",
+    "category": "warehouse",
+    "description": "statement_timeout exceeded",
+    "pipeline_name": "patchit_snowflake_issue_021"
+  },
+  {
+    "id": "SF022",
+    "platform": "snowflake",
+    "title": "Snowpipe notification misconfigured",
+    "category": "ingestion",
+    "description": "auto-ingest not firing",
+    "pipeline_name": "patchit_snowflake_issue_022"
+  },
+  {
+    "id": "SF023",
+    "platform": "snowflake",
+    "title": "External function endpoint down",
+    "category": "integration",
+    "description": "API integration unreachable",
+    "pipeline_name": "patchit_snowflake_issue_023"
+  },
+  {
+    "id": "SF024",
+    "platform": "snowflake",
+    "title": "Clone/restore confusion",
+    "category": "release",
+    "description": "job points to stale clone",
+    "pipeline_name": "patchit_snowflake_issue_024"
+  },
+  {
+    "id": "SF025",
+    "platform": "snowflake",
+    "title": "Task history query permission error",
+    "category": "observability",
+    "description": "ACCOUNT_USAGE access missing",
+    "pipeline_name": "patchit_snowflake_issue_025"
+  },
+  {
+    "id": "GL001",
+    "platform": "aws_glue",
+    "title": "Missing source object in S3",
+    "category": "ingestion",
+    "description": "expected key not present",
+    "pipeline_name": "patchit_glue_issue_001"
+  },
+  {
+    "id": "GL002",
+    "platform": "aws_glue",
+    "title": "Corrupt parquet file",
+    "category": "ingestion",
+    "description": "footer metadata unreadable",
+    "pipeline_name": "patchit_glue_issue_002"
+  },
+  {
+    "id": "GL003",
+    "platform": "aws_glue",
+    "title": "Crawler inferred wrong type",
+    "category": "schema",
+    "description": "column type changed to string",
+    "pipeline_name": "patchit_glue_issue_003"
+  },
+  {
+    "id": "GL004",
+    "platform": "aws_glue",
+    "title": "Glue catalog table missing",
+    "category": "schema",
+    "description": "database/table not found",
+    "pipeline_name": "patchit_glue_issue_004"
+  },
+  {
+    "id": "GL005",
+    "platform": "aws_glue",
+    "title": "Job bookmark reset unexpectedly",
+    "category": "cdc",
+    "description": "old files reprocessed",
+    "pipeline_name": "patchit_glue_issue_005"
+  },
+  {
+    "id": "GL006",
+    "platform": "aws_glue",
+    "title": "Job bookmark not advancing",
+    "category": "cdc",
+    "description": "state write failure",
+    "pipeline_name": "patchit_glue_issue_006"
+  },
+  {
+    "id": "GL007",
+    "platform": "aws_glue",
+    "title": "IAM role lacks KMS decrypt",
+    "category": "security",
+    "description": "cannot read encrypted objects",
+    "pipeline_name": "patchit_glue_issue_007"
+  },
+  {
+    "id": "GL008",
+    "platform": "aws_glue",
+    "title": "Access denied writing target prefix",
+    "category": "security",
+    "description": "missing putObject permission",
+    "pipeline_name": "patchit_glue_issue_008"
+  },
+  {
+    "id": "GL009",
+    "platform": "aws_glue",
+    "title": "DynamicFrame conversion failure",
+    "category": "code",
+    "description": "invalid nested schema conversion",
+    "pipeline_name": "patchit_glue_issue_009"
+  },
+  {
+    "id": "GL010",
+    "platform": "aws_glue",
+    "title": "Spark OOM on wide transformation",
+    "category": "runtime",
+    "description": "executor memory exceeded",
+    "pipeline_name": "patchit_glue_issue_010"
+  },
+  {
+    "id": "GL011",
+    "platform": "aws_glue",
+    "title": "Skewed partition causing task stragglers",
+    "category": "runtime",
+    "description": "single partition massive",
+    "pipeline_name": "patchit_glue_issue_011"
+  },
+  {
+    "id": "GL012",
+    "platform": "aws_glue",
+    "title": "Glue job timeout",
+    "category": "runtime",
+    "description": "job exceeded max runtime",
+    "pipeline_name": "patchit_glue_issue_012"
+  },
+  {
+    "id": "GL013",
+    "platform": "aws_glue",
+    "title": "Connection timeout to JDBC source",
+    "category": "integration",
+    "description": "source db unavailable",
+    "pipeline_name": "patchit_glue_issue_013"
+  },
+  {
+    "id": "GL014",
+    "platform": "aws_glue",
+    "title": "SSL handshake failure to JDBC",
+    "category": "integration",
+    "description": "certificate mismatch",
+    "pipeline_name": "patchit_glue_issue_014"
+  },
+  {
+    "id": "GL015",
+    "platform": "aws_glue",
+    "title": "NullPointerException in custom transform",
+    "category": "code",
+    "description": "custom function null dereference",
+    "pipeline_name": "patchit_glue_issue_015"
+  },
+  {
+    "id": "GL016",
+    "platform": "aws_glue",
+    "title": "Incorrect pushdown predicate",
+    "category": "transformation",
+    "description": "filters out valid records",
+    "pipeline_name": "patchit_glue_issue_016"
+  },
+  {
+    "id": "GL017",
+    "platform": "aws_glue",
+    "title": "Partition key missing in sink",
+    "category": "data_quality",
+    "description": "writes to default partition",
+    "pipeline_name": "patchit_glue_issue_017"
+  },
+  {
+    "id": "GL018",
+    "platform": "aws_glue",
+    "title": "Duplicate writes on retry",
+    "category": "reliability",
+    "description": "non-idempotent sink",
+    "pipeline_name": "patchit_glue_issue_018"
+  },
+  {
+    "id": "GL019",
+    "platform": "aws_glue",
+    "title": "Schema evolution not handled",
+    "category": "schema",
+    "description": "new column breaks sink mapping",
+    "pipeline_name": "patchit_glue_issue_019"
+  },
+  {
+    "id": "GL020",
+    "platform": "aws_glue",
+    "title": "SCD2 merge logic broken",
+    "category": "modeling",
+    "description": "history rows overlap",
+    "pipeline_name": "patchit_glue_issue_020"
+  },
+  {
+    "id": "GL021",
+    "platform": "aws_glue",
+    "title": "CDC delete records dropped",
+    "category": "cdc",
+    "description": "operation flag not mapped",
+    "pipeline_name": "patchit_glue_issue_021"
+  },
+  {
+    "id": "GL022",
+    "platform": "aws_glue",
+    "title": "Upstream trigger available but delayed",
+    "category": "orchestration",
+    "description": "event arrives after SLA",
+    "pipeline_name": "patchit_glue_issue_022"
+  },
+  {
+    "id": "GL023",
+    "platform": "aws_glue",
+    "title": "Upstream trigger unavailable",
+    "category": "orchestration",
+    "description": "event source down",
+    "pipeline_name": "patchit_glue_issue_023"
+  },
+  {
+    "id": "GL024",
+    "platform": "aws_glue",
+    "title": "CloudWatch logs missing correlation id",
+    "category": "observability",
+    "description": "cannot trace end-to-end",
+    "pipeline_name": "patchit_glue_issue_024"
+  },
+  {
+    "id": "GL025",
+    "platform": "aws_glue",
+    "title": "Cost explosion due accidental full scan",
+    "category": "finops",
+    "description": "partition pruning disabled",
+    "pipeline_name": "patchit_glue_issue_025"
+  }
+]

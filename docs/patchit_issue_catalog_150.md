@@ -1,0 +1,159 @@
+# PATCHIT Real-World Data Engineering Failure Catalog (150)
+
+> Curated from common industry failure patterns across incident management, analytics engineering, SRE toil, and data platform operations.
+
+## Split
+- Airflow DAG scenarios: 100
+- Snowflake scenarios: 25
+- AWS Glue scenarios: 25
+
+- **AF001** [airflow] `patchit_airflow_issue_001` - Missing PK in source table (data_quality): primary key null or duplicated in upstream extract
+- **AF002** [airflow] `patchit_airflow_issue_002` - Unexpected null surge in critical column (data_quality): null ratio exceeds threshold after source deployment
+- **AF003** [airflow] `patchit_airflow_issue_003` - Referential integrity break (data_quality): foreign keys point to non-existent dimension rows
+- **AF004** [airflow] `patchit_airflow_issue_004` - Duplicate event ingestion (ingestion): dedupe key changed causing duplicate load
+- **AF005** [airflow] `patchit_airflow_issue_005` - Late arriving dimension causes fact mismatch (timeliness): fact arrives before dimension in SLA window
+- **AF006** [airflow] `patchit_airflow_issue_006` - Timezone skew between sources (transformation): UTC/local conversion mismatch creates date drift
+- **AF007** [airflow] `patchit_airflow_issue_007` - Schema drift new nullable column (schema): new column appears and transform silently drops it
+- **AF008** [airflow] `patchit_airflow_issue_008` - Schema drift changed data type (schema): integer changed to string in upstream payload
+- **AF009** [airflow] `patchit_airflow_issue_009` - Schema mismatch with contract (schema): producer schema version differs from consumer expectation
+- **AF010** [airflow] `patchit_airflow_issue_010` - Schema unavailable from registry (schema): schema registry timeout/unavailable
+- **AF011** [airflow] `patchit_airflow_issue_011` - Missing source partition (ingestion): expected partition path does not exist
+- **AF012** [airflow] `patchit_airflow_issue_012` - Truncated file in landing zone (ingestion): partial file upload due to network interruption
+- **AF013** [airflow] `patchit_airflow_issue_013` - Compressed file corrupt (ingestion): gzip archive unreadable
+- **AF014** [airflow] `patchit_airflow_issue_014` - CSV delimiter changed (ingestion): source switched delimiter without notice
+- **AF015** [airflow] `patchit_airflow_issue_015` - Header row missing (ingestion): extract produced data rows without column headers
+- **AF016** [airflow] `patchit_airflow_issue_016` - SCD2 overlap windows (modeling): effective_from/effective_to overlap for same natural key
+- **AF017** [airflow] `patchit_airflow_issue_017` - SCD2 open record duplication (modeling): multiple current records flagged active
+- **AF018** [airflow] `patchit_airflow_issue_018` - CDC missing delete events (cdc): delete ops not emitted by connector
+- **AF019** [airflow] `patchit_airflow_issue_019` - CDC out-of-order events (cdc): update before insert due to lag/replay
+- **AF020** [airflow] `patchit_airflow_issue_020` - CDC LSN gap detected (cdc): binlog offset skipped during failover
+- **AF021** [airflow] `patchit_airflow_issue_021` - Upstream job unavailable hard dependency (orchestration): upstream DAG failed and downstream still triggered
+- **AF022** [airflow] `patchit_airflow_issue_022` - Upstream job delayed soft dependency (orchestration): upstream completed but beyond downstream freshness SLA
+- **AF023** [airflow] `patchit_airflow_issue_023` - Circular dependency in DAG graph (orchestration): new dependency introduces cycle
+- **AF024** [airflow] `patchit_airflow_issue_024` - Deadlock on warehouse table lock (runtime): concurrent merge operations deadlock
+- **AF025** [airflow] `patchit_airflow_issue_025` - OOM during Spark transform (runtime): executor memory exhausted on skewed join
+- **AF026** [airflow] `patchit_airflow_issue_026` - Driver OOM from collect() misuse (runtime): collect loads full dataset to driver
+- **AF027** [airflow] `patchit_airflow_issue_027` - Shuffle spill saturation (runtime): insufficient disk for shuffle spill
+- **AF028** [airflow] `patchit_airflow_issue_028` - Skewed key causes long tail tasks (runtime): single hot key dominates partition
+- **AF029** [airflow] `patchit_airflow_issue_029` - Broadcast join threshold misconfigured (runtime): broadcast too large causing executor crash
+- **AF030** [airflow] `patchit_airflow_issue_030` - NullPointerException in UDF (code): UDF does not guard null input
+- **AF031** [airflow] `patchit_airflow_issue_031` - TypeError in Python transform (code): string concatenated with integer
+- **AF032** [airflow] `patchit_airflow_issue_032` - ImportError missing dependency (code): new library not installed in runtime image
+- **AF033** [airflow] `patchit_airflow_issue_033` - Runtime version mismatch (code): python/spark version incompatible with package
+- **AF034** [airflow] `patchit_airflow_issue_034` - Task retry storm due non-idempotent writes (reliability): retry duplicates side effects
+- **AF035** [airflow] `patchit_airflow_issue_035` - Idempotency key missing (reliability): same batch reprocessed creates duplicate facts
+- **AF036** [airflow] `patchit_airflow_issue_036` - Checkpoint corruption (streaming): stream checkpoint directory corrupted
+- **AF037** [airflow] `patchit_airflow_issue_037` - Offset commit failure (streaming): consumer cannot commit offsets
+- **AF038** [airflow] `patchit_airflow_issue_038` - Kafka topic retention too low (streaming): events expired before consumption
+- **AF039** [airflow] `patchit_airflow_issue_039` - Poison pill record blocks stream (streaming): single malformed message crashes microbatch
+- **AF040** [airflow] `patchit_airflow_issue_040` - Secrets retrieval failure (platform): vault token expired
+- **AF041** [airflow] `patchit_airflow_issue_041` - Expired cloud credentials (platform): temporary IAM creds expired mid-run
+- **AF042** [airflow] `patchit_airflow_issue_042` - Permission denied on object store path (platform): missing read ACL on landing bucket
+- **AF043** [airflow] `patchit_airflow_issue_043` - Permission denied on warehouse schema (platform): role lacks USAGE/CREATE rights
+- **AF044** [airflow] `patchit_airflow_issue_044` - Network egress blocked to API source (platform): firewall rule blocks source endpoint
+- **AF045** [airflow] `patchit_airflow_issue_045` - DNS resolution failure for source host (platform): private DNS outage
+- **AF046** [airflow] `patchit_airflow_issue_046` - TLS certificate expired upstream API (platform): HTTPS handshake fails
+- **AF047** [airflow] `patchit_airflow_issue_047` - API rate limit exceeded (ingestion): 429 from source API
+- **AF048** [airflow] `patchit_airflow_issue_048` - Pagination bug skips records (ingestion): cursor handling drops middle page
+- **AF049** [airflow] `patchit_airflow_issue_049` - Incremental watermark not persisted (ingestion): state store write failed causing full reload
+- **AF050** [airflow] `patchit_airflow_issue_050` - Watermark timezone mismatch (ingestion): last_processed uses local time not UTC
+- **AF051** [airflow] `patchit_airflow_issue_051` - Backfill overlaps with daily load (orchestration): same date range loaded by two jobs
+- **AF052** [airflow] `patchit_airflow_issue_052` - Hardcoded environment path (code): job points to dev bucket in prod
+- **AF053** [airflow] `patchit_airflow_issue_053` - Configuration key missing (code): required config absent in env
+- **AF054** [airflow] `patchit_airflow_issue_054` - YAML parse error in pipeline config (code): invalid config syntax
+- **AF055** [airflow] `patchit_airflow_issue_055` - Feature flag enabled without migration (release): code path references absent table
+- **AF056** [airflow] `patchit_airflow_issue_056` - Incorrect join condition duplicates rows (transformation): many-to-many join unintended
+- **AF057** [airflow] `patchit_airflow_issue_057` - Window function partition bug (transformation): partition key omitted
+- **AF058** [airflow] `patchit_airflow_issue_058` - Incorrect dedupe ordering (transformation): old record chosen as latest
+- **AF059** [airflow] `patchit_airflow_issue_059` - Currency conversion table stale (data_quality): fx table not refreshed
+- **AF060** [airflow] `patchit_airflow_issue_060` - Business calendar mismatch (data_quality): holiday calendar outdated
+- **AF061** [airflow] `patchit_airflow_issue_061` - PII masking regression (governance): sensitive columns no longer masked
+- **AF062** [airflow] `patchit_airflow_issue_062` - GDPR delete request not propagated (governance): subject delete not applied downstream
+- **AF063** [airflow] `patchit_airflow_issue_063` - Data contract violation field removed (contract): producer removed mandatory field
+- **AF064** [airflow] `patchit_airflow_issue_064` - Data contract violation semantic change (contract): same field now different meaning
+- **AF065** [airflow] `patchit_airflow_issue_065` - Metric definition drift (semantic): KPI SQL changed without versioning
+- **AF066** [airflow] `patchit_airflow_issue_066` - Dimension surrogate key collision (modeling): key generator reset after restart
+- **AF067** [airflow] `patchit_airflow_issue_067` - Surrogate key negative overflow (modeling): integer overflow in key generation
+- **AF068** [airflow] `patchit_airflow_issue_068` - Fact grain violation (modeling): fact table contains mixed grains
+- **AF069** [airflow] `patchit_airflow_issue_069` - Snapshot not aligned to source cutoff (timeliness): snapshot captured mid-transaction
+- **AF070** [airflow] `patchit_airflow_issue_070` - Merge statement updates wrong rows (warehouse): merge ON clause missing predicate
+- **AF071** [airflow] `patchit_airflow_issue_071` - Delete without where clause safeguard (warehouse): full table accidental delete
+- **AF072** [airflow] `patchit_airflow_issue_072` - Long-running query timeout (warehouse): warehouse timeout threshold exceeded
+- **AF073** [airflow] `patchit_airflow_issue_073` - Warehouse suspended mid-job (warehouse): compute auto-suspend too aggressive
+- **AF074** [airflow] `patchit_airflow_issue_074` - Temp table name collision (warehouse): parallel runs share static temp table name
+- **AF075** [airflow] `patchit_airflow_issue_075` - Case sensitivity mismatch on column names (schema): quoted identifiers break transform
+- **AF076** [airflow] `patchit_airflow_issue_076` - UTF-8 decoding error in source file (ingestion): unexpected encoding cp1252
+- **AF077** [airflow] `patchit_airflow_issue_077` - JSON path missing nested field (ingestion): payload shape changed
+- **AF078** [airflow] `patchit_airflow_issue_078` - Array explosion cardinality blowup (transformation): explode creates huge intermediate rows
+- **AF079** [airflow] `patchit_airflow_issue_079` - Cross join accidentally introduced (transformation): missing join predicate
+- **AF080** [airflow] `patchit_airflow_issue_080` - Row-level security policy blocks job (governance): service role sees zero rows
+- **AF081** [airflow] `patchit_airflow_issue_081` - Airflow queue saturation (orchestration): executor slots exhausted
+- **AF082** [airflow] `patchit_airflow_issue_082` - Zombie task after worker restart (orchestration): state says running but process dead
+- **AF083** [airflow] `patchit_airflow_issue_083` - Scheduler lag from too many DAG parses (orchestration): parsing overhead delays scheduling
+- **AF084** [airflow] `patchit_airflow_issue_084` - Task heartbeat timeout (orchestration): worker network blip
+- **AF085** [airflow] `patchit_airflow_issue_085` - Incorrect retry delay exponential overflow (orchestration): retry delay computed too high
+- **AF086** [airflow] `patchit_airflow_issue_086` - SLA miss not alerting (observability): SLA callback misconfigured
+- **AF087** [airflow] `patchit_airflow_issue_087` - Alert flood duplicate incidents (observability): same root cause opens many incidents
+- **AF088** [airflow] `patchit_airflow_issue_088` - Log retention too short for RCA (observability): logs deleted before investigation
+- **AF089** [airflow] `patchit_airflow_issue_089` - Trace context lost across tasks (observability): correlation id not propagated
+- **AF090** [airflow] `patchit_airflow_issue_090` - Upstream API returns partial success (integration): 200 response with failed records
+- **AF091** [airflow] `patchit_airflow_issue_091` - Webhook callback not idempotent (integration): duplicate callbacks create double processing
+- **AF092** [airflow] `patchit_airflow_issue_092` - External dependency maintenance window (integration): third-party service unavailable
+- **AF093** [airflow] `patchit_airflow_issue_093` - Container image pull failure (platform): registry auth/token issue
+- **AF094** [airflow] `patchit_airflow_issue_094` - Disk full on worker node (platform): local temp storage exhausted
+- **AF095** [airflow] `patchit_airflow_issue_095` - Clock skew between nodes (platform): token validation fails due time drift
+- **AF096** [airflow] `patchit_airflow_issue_096` - KMS decryption failure (platform): wrong key alias or revoked policy
+- **AF097** [airflow] `patchit_airflow_issue_097` - Orphaned staging files after failure (reliability): cleanup task skipped on exception
+- **AF098** [airflow] `patchit_airflow_issue_098` - Compaction job skipped causing file explosion (reliability): small file problem degrades query
+- **AF099** [airflow] `patchit_airflow_issue_099` - Rollback script incompatible with latest schema (release): rollback cannot run after migration
+- **AF100** [airflow] `patchit_airflow_issue_100` - Canary check ignored before full rollout (release): bad change promoted to all pipelines
+- **SF001** [snowflake] `patchit_snowflake_issue_001` - Warehouse not available (warehouse): configured virtual warehouse does not exist
+- **SF002** [snowflake] `patchit_snowflake_issue_002` - Role missing privilege (security): role lacks USAGE on database
+- **SF003** [snowflake] `patchit_snowflake_issue_003` - Schema drift in staged files (schema): COPY INTO fails due column mismatch
+- **SF004** [snowflake] `patchit_snowflake_issue_004` - Stage credentials expired (security): external stage integration token expired
+- **SF005** [snowflake] `patchit_snowflake_issue_005` - File format mismatch (ingestion): CSV quoted fields parsed incorrectly
+- **SF006** [snowflake] `patchit_snowflake_issue_006` - Task suspended unexpectedly (orchestration): root task disabled
+- **SF007** [snowflake] `patchit_snowflake_issue_007` - Task dependency broken (orchestration): AFTER references dropped task
+- **SF008** [snowflake] `patchit_snowflake_issue_008` - Stream stale (cdc): stream offset aged out
+- **SF009** [snowflake] `patchit_snowflake_issue_009` - Merge duplicates due ON condition (modeling): upsert key incomplete
+- **SF010** [snowflake] `patchit_snowflake_issue_010` - Primary key not enforced logically (data_quality): duplicates in business key
+- **SF011** [snowflake] `patchit_snowflake_issue_011` - Null in not-null business field (data_quality): upstream null spikes
+- **SF012** [snowflake] `patchit_snowflake_issue_012` - Numeric overflow on cast (transformation): value exceeds target precision
+- **SF013** [snowflake] `patchit_snowflake_issue_013` - Invalid UTF8 in VARIANT (ingestion): JSON parser failure
+- **SF014** [snowflake] `patchit_snowflake_issue_014` - Timezone conversion bug (transformation): timestamp_ntz interpreted as local
+- **SF015** [snowflake] `patchit_snowflake_issue_015` - SCD2 close/open bug (modeling): current flag set on multiple rows
+- **SF016** [snowflake] `patchit_snowflake_issue_016` - CDC delete tombstone ignored (cdc): delete op filtered out
+- **SF017** [snowflake] `patchit_snowflake_issue_017` - Stage path missing daily folder (ingestion): date partition absent
+- **SF018** [snowflake] `patchit_snowflake_issue_018` - Network policy blocks connector (platform): client IP not allowed
+- **SF019** [snowflake] `patchit_snowflake_issue_019` - Masking policy regression (governance): sensitive data exposed
+- **SF020** [snowflake] `patchit_snowflake_issue_020` - Row access policy filters all rows (governance): service role sees empty dataset
+- **SF021** [snowflake] `patchit_snowflake_issue_021` - Long running query timeout (warehouse): statement_timeout exceeded
+- **SF022** [snowflake] `patchit_snowflake_issue_022` - Snowpipe notification misconfigured (ingestion): auto-ingest not firing
+- **SF023** [snowflake] `patchit_snowflake_issue_023` - External function endpoint down (integration): API integration unreachable
+- **SF024** [snowflake] `patchit_snowflake_issue_024` - Clone/restore confusion (release): job points to stale clone
+- **SF025** [snowflake] `patchit_snowflake_issue_025` - Task history query permission error (observability): ACCOUNT_USAGE access missing
+- **GL001** [aws_glue] `patchit_glue_issue_001` - Missing source object in S3 (ingestion): expected key not present
+- **GL002** [aws_glue] `patchit_glue_issue_002` - Corrupt parquet file (ingestion): footer metadata unreadable
+- **GL003** [aws_glue] `patchit_glue_issue_003` - Crawler inferred wrong type (schema): column type changed to string
+- **GL004** [aws_glue] `patchit_glue_issue_004` - Glue catalog table missing (schema): database/table not found
+- **GL005** [aws_glue] `patchit_glue_issue_005` - Job bookmark reset unexpectedly (cdc): old files reprocessed
+- **GL006** [aws_glue] `patchit_glue_issue_006` - Job bookmark not advancing (cdc): state write failure
+- **GL007** [aws_glue] `patchit_glue_issue_007` - IAM role lacks KMS decrypt (security): cannot read encrypted objects
+- **GL008** [aws_glue] `patchit_glue_issue_008` - Access denied writing target prefix (security): missing putObject permission
+- **GL009** [aws_glue] `patchit_glue_issue_009` - DynamicFrame conversion failure (code): invalid nested schema conversion
+- **GL010** [aws_glue] `patchit_glue_issue_010` - Spark OOM on wide transformation (runtime): executor memory exceeded
+- **GL011** [aws_glue] `patchit_glue_issue_011` - Skewed partition causing task stragglers (runtime): single partition massive
+- **GL012** [aws_glue] `patchit_glue_issue_012` - Glue job timeout (runtime): job exceeded max runtime
+- **GL013** [aws_glue] `patchit_glue_issue_013` - Connection timeout to JDBC source (integration): source db unavailable
+- **GL014** [aws_glue] `patchit_glue_issue_014` - SSL handshake failure to JDBC (integration): certificate mismatch
+- **GL015** [aws_glue] `patchit_glue_issue_015` - NullPointerException in custom transform (code): custom function null dereference
+- **GL016** [aws_glue] `patchit_glue_issue_016` - Incorrect pushdown predicate (transformation): filters out valid records
+- **GL017** [aws_glue] `patchit_glue_issue_017` - Partition key missing in sink (data_quality): writes to default partition
+- **GL018** [aws_glue] `patchit_glue_issue_018` - Duplicate writes on retry (reliability): non-idempotent sink
+- **GL019** [aws_glue] `patchit_glue_issue_019` - Schema evolution not handled (schema): new column breaks sink mapping
+- **GL020** [aws_glue] `patchit_glue_issue_020` - SCD2 merge logic broken (modeling): history rows overlap
+- **GL021** [aws_glue] `patchit_glue_issue_021` - CDC delete records dropped (cdc): operation flag not mapped
+- **GL022** [aws_glue] `patchit_glue_issue_022` - Upstream trigger available but delayed (orchestration): event arrives after SLA
+- **GL023** [aws_glue] `patchit_glue_issue_023` - Upstream trigger unavailable (orchestration): event source down
+- **GL024** [aws_glue] `patchit_glue_issue_024` - CloudWatch logs missing correlation id (observability): cannot trace end-to-end
+- **GL025** [aws_glue] `patchit_glue_issue_025` - Cost explosion due accidental full scan (finops): partition pruning disabled
