@@ -83,6 +83,7 @@ def process_customers():
         f"{silver_base_path}/customers",
         ["customer_id"],
     )
+    return latest
 
 
 def process_products():
@@ -94,6 +95,7 @@ def process_products():
         f"{silver_base_path}/products",
         ["product_id"],
     )
+    return latest
 
 
 def process_orders():
@@ -116,13 +118,14 @@ def process_orders():
         f"{silver_base_path}/order_items",
         ["order_item_id"],
     )
+    return latest_orders
 
 
 if domain == "customers":
-    process_customers()
+    silver_totals = process_customers()
 elif domain == "products":
-    process_products()
+    silver_totals = process_products()
 else:
-    process_orders()
+    silver_totals = process_orders()
 
 dbutils.notebook.exit(f"Silver transform completed for domain={domain}")
