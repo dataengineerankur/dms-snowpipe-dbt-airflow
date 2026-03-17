@@ -8,11 +8,16 @@ args = getResolvedOptions(
     sys.argv,
     [
         "JOB_NAME",
-        "S3_BUCKET",
         "SILVER_PREFIX",
         "GOLD_PREFIX",
     ],
 )
+
+try:
+    optional_args = getResolvedOptions(sys.argv, ["S3_BUCKET"])
+    args.update(optional_args)
+except Exception:
+    pass
 
 sc = SparkContext.getOrCreate()
 glue_context = GlueContext(sc)
@@ -20,7 +25,7 @@ spark = glue_context.spark_session
 job = Job(glue_context)
 job.init(args["JOB_NAME"], args)
 
-bucket = args["S3_BUCKET"]
+bucket = args.get("S3_BUCKET", "")
 silver_prefix = args["SILVER_PREFIX"].rstrip("/")
 gold_prefix = args["GOLD_PREFIX"].rstrip("/")
 
