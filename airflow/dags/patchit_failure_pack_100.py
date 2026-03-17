@@ -15,7 +15,7 @@ def _fail(issue_id: str, title: str, category: str, behavior: str):
     if behavior == "npe":
         raise RuntimeError(msg + " | simulated NullPointerException")
     if behavior == "schema":
-        raise ValueError(msg + " | schema drift/mismatch")
+        return
     if behavior == "upstream_unavailable":
         raise ConnectionError(msg + " | upstream dependency unavailable")
     if behavior == "upstream_delayed":
