@@ -1,3 +1,4 @@
+import os
 import sys
 from awsglue.context import GlueContext
 from awsglue.job import Job
@@ -8,7 +9,6 @@ args = getResolvedOptions(
     sys.argv,
     [
         "JOB_NAME",
-        "S3_BUCKET",
         "SILVER_PREFIX",
         "GOLD_PREFIX",
     ],
@@ -20,7 +20,7 @@ spark = glue_context.spark_session
 job = Job(glue_context)
 job.init(args["JOB_NAME"], args)
 
-bucket = args["S3_BUCKET"]
+bucket = args.get("S3_BUCKET") or os.environ.get("S3_BUCKET", "dms-data-lake")
 silver_prefix = args["SILVER_PREFIX"].rstrip("/")
 gold_prefix = args["GOLD_PREFIX"].rstrip("/")
 
