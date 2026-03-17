@@ -5,15 +5,17 @@ from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from pyspark.sql import functions as F
 
-args = getResolvedOptions(
-    sys.argv,
-    [
-        "JOB_NAME",
-        "S3_BUCKET",
-        "SILVER_PREFIX",
-        "GOLD_PREFIX",
-    ],
-)
+args = getResolvedOptions(sys.argv, ["JOB_NAME"])
+
+def get_arg(key, default=None):
+    for i, arg in enumerate(sys.argv):
+        if arg == f"--{key}" and i + 1 < len(sys.argv):
+            return sys.argv[i + 1]
+    return default
+
+args["S3_BUCKET"] = get_arg("S3_BUCKET", "default-bucket")
+args["SILVER_PREFIX"] = get_arg("SILVER_PREFIX", "silver")
+args["GOLD_PREFIX"] = get_arg("GOLD_PREFIX", "gold")
 
 sc = SparkContext.getOrCreate()
 glue_context = GlueContext(sc)
