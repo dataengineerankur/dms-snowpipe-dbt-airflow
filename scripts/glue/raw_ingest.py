@@ -10,20 +10,24 @@ args = getResolvedOptions(
     sys.argv,
     [
         "JOB_NAME",
-        "SOURCE_BUCKET",
-        "SOURCE_PREFIX",
         "TARGET_BUCKET",
         "RAW_PREFIX",
     ],
 )
+
+try:
+    optional_args = getResolvedOptions(sys.argv, ["SOURCE_BUCKET", "SOURCE_PREFIX"])
+    args.update(optional_args)
+except Exception:
+    pass
 
 sc = SparkContext.getOrCreate()
 glue_context = GlueContext(sc)
 job = Job(glue_context)
 job.init(args["JOB_NAME"], args)
 
-source_bucket = args["SOURCE_BUCKET"]
-source_prefix = args["SOURCE_PREFIX"].rstrip("/")
+source_bucket = args.get("SOURCE_BUCKET", args["TARGET_BUCKET"])
+source_prefix = args.get("SOURCE_PREFIX", "dms-source").rstrip("/")
 target_bucket = args["TARGET_BUCKET"]
 raw_prefix = args["RAW_PREFIX"].rstrip("/")
 
