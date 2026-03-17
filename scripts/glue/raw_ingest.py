@@ -10,20 +10,25 @@ args = getResolvedOptions(
     sys.argv,
     [
         "JOB_NAME",
-        "SOURCE_BUCKET",
-        "SOURCE_PREFIX",
         "TARGET_BUCKET",
         "RAW_PREFIX",
     ],
 )
+
+optional_args = {}
+for arg_name in ["SOURCE_BUCKET", "SOURCE_PREFIX"]:
+    try:
+        optional_args.update(getResolvedOptions(sys.argv, [arg_name]))
+    except Exception:
+        pass
 
 sc = SparkContext.getOrCreate()
 glue_context = GlueContext(sc)
 job = Job(glue_context)
 job.init(args["JOB_NAME"], args)
 
-source_bucket = args["SOURCE_BUCKET"]
-source_prefix = args["SOURCE_PREFIX"].rstrip("/")
+source_bucket = optional_args.get("SOURCE_BUCKET", args["TARGET_BUCKET"])
+source_prefix = optional_args.get("SOURCE_PREFIX", "").rstrip("/")
 target_bucket = args["TARGET_BUCKET"]
 raw_prefix = args["RAW_PREFIX"].rstrip("/")
 
