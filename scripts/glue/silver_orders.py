@@ -10,11 +10,14 @@ args = getResolvedOptions(
     sys.argv,
     [
         "JOB_NAME",
-        "S3_BUCKET",
-        "RAW_PREFIX",
-        "SILVER_PREFIX",
     ],
 )
+
+try:
+    optional_args = getResolvedOptions(sys.argv, ["S3_BUCKET", "RAW_PREFIX", "SILVER_PREFIX", "TempDir"])
+    args.update(optional_args)
+except Exception:
+    pass
 
 sc = SparkContext.getOrCreate()
 glue_context = GlueContext(sc)
@@ -22,9 +25,15 @@ spark = glue_context.spark_session
 job = Job(glue_context)
 job.init(args["JOB_NAME"], args)
 
-bucket = args["S3_BUCKET"]
-raw_prefix = args["RAW_PREFIX"].rstrip("/")
-silver_prefix = args["SILVER_PREFIX"].rstrip("/")
+if "S3_BUCKET" not in args and "TempDir" in args:
+    temp_dir = args["TempDir"]
+    if temp_dir.startswith("s3://"):
+        bucket = temp_dir.replace("s3://", "").split("/")[0]
+        args["S3_BUCKET"] = bucket
+
+bucket = args.get("S3_BUCKET", "")
+raw_prefix = args.get("RAW_PREFIX", "raw").rstrip("/")
+silver_prefix = args.get("SILVER_PREFIX", "silver").rstrip("/")
 
 today = F.date_format(F.current_date(), "yyyyMMdd")
 
@@ -40,6 +49,9 @@ def dedupe_latest(df, key_col, ts_cols):
     w = Window.partitionBy(key_col).orderBy(*order_cols)
     return df.withColumn("rn", F.row_number().over(w)).filter(F.col("rn") == 1).drop("rn")
 
+
+orders = read_raw("orders")
+order_items = read_raw("order_items")
 
 op_col_orders = F.col("dms_op") if "dms_op" in orders.columns else F.col("Op")
 orders = orders.filter((op_col_orders.isNull()) | (op_col_orders != "D"))
