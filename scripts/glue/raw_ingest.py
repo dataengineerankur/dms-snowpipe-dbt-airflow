@@ -34,6 +34,24 @@ raw_prefix = raw_prefix + "/" if raw_prefix else ""
 
 paginator = s3.get_paginator("list_objects_v2")
 copied = 0
+valid_tables = {"customers", "products", "orders", "order_items"}
+
+
+def delete_prefix(bucket, prefix):
+    keys = []
+    for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
+        for obj in page.get("Contents", []):
+            keys.append({"Key": obj["Key"]})
+            if len(keys) == 1000:
+                s3.delete_objects(Bucket=bucket, Delete={"Objects": keys})
+                keys = []
+    if keys:
+        s3.delete_objects(Bucket=bucket, Delete={"Objects": keys})
+
+
+# Keep bronze layer clean from old buggy runs.
+for stale in ["sales/", "awsdms_history/", "awsdms_status/", "awsdms_suspended_tables/"]:
+    delete_prefix(target_bucket, f"{raw_prefix}{stale}")
 
 for page in paginator.paginate(Bucket=source_bucket, Prefix=source_prefix):
     for obj in page.get("Contents", []):
@@ -41,6 +59,11 @@ for page in paginator.paginate(Bucket=source_bucket, Prefix=source_prefix):
         if key.endswith("/"):
             continue
         relative_key = key[len(source_prefix) :] if source_prefix else key
+        if relative_key.startswith("sales/"):
+            relative_key = relative_key[len("sales/") :]
+        parts = relative_key.split("/", 1)
+        if not parts or parts[0] not in valid_tables:
+            continue
         target_key = f"{raw_prefix}{relative_key}"
         s3.copy_object(
             Bucket=target_bucket,
