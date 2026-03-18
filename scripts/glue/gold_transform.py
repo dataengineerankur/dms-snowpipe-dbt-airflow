@@ -1,4 +1,5 @@
 import sys
+import os
 from awsglue.context import GlueContext
 from awsglue.job import Job
 from awsglue.utils import getResolvedOptions
@@ -9,9 +10,14 @@ args = getResolvedOptions(
     sys.argv,
     [
         "JOB_NAME",
-        "S3_BUCKET",
     ],
 )
+
+optional_args = {}
+try:
+    optional_args = getResolvedOptions(sys.argv, ["S3_BUCKET"])
+except Exception:
+    pass
 
 sc = SparkContext.getOrCreate()
 glue_context = GlueContext(sc)
@@ -19,7 +25,7 @@ spark = glue_context.spark_session
 job = Job(glue_context)
 job.init(args["JOB_NAME"], args)
 
-bucket = args["S3_BUCKET"]
+bucket = optional_args.get("S3_BUCKET") or os.environ.get("S3_BUCKET") or "default-bucket"
 
 def read_silver(table):
     return spark.read.parquet(f"s3://{bucket}/glue/silver/{table}/")
