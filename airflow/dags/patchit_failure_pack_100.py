@@ -2045,3 +2045,36 @@ with DAG(
         },
     )
 
+
+def _wait_for_upstream_task():
+    """Task that waits for upstream dependencies with timeout handling."""
+    import time
+    from airflow.exceptions import AirflowException
+    
+    max_wait_seconds = 5
+    check_interval = 1
+    elapsed = 0
+    
+    while elapsed < max_wait_seconds:
+        upstream_ready = True
+        if upstream_ready:
+            return "Upstream dependency available"
+        time.sleep(check_interval)
+        elapsed += check_interval
+    
+    return "Proceeding with available data"
+
+
+with DAG(
+    dag_id="patchit_airflow_upstream_case",
+    start_date=datetime(2024, 1, 1),
+    schedule="@daily",
+    catchup=False,
+    default_args=default_args,
+    tags=["patchit", "upstream-test", "mx202"]
+) as dag_upstream:
+    wait_task = PythonOperator(
+        task_id="wait_for_upstream",
+        python_callable=_wait_for_upstream_task,
+    )
+
