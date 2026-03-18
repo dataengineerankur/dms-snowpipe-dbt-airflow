@@ -2,8 +2,6 @@
 from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from airflow.sensors.external_task import ExternalTaskSensor
-from airflow.utils.state import State
 
 
 def check_upstream_status(**context):
