@@ -44,23 +44,23 @@ with DAG(
     description="MX202: Airflow upstream dependency unavailable"
 ) as dag:
     
-    check_upstream = PythonOperator(
+    check_upstream_task = PythonOperator(
         task_id="check_upstream_status",
         python_callable=check_upstream_status,
         provide_context=True,
     )
     
-    wait_for_upstream = PythonOperator(
+    wait_for_upstream_task = PythonOperator(
         task_id="wait_for_upstream",
         python_callable=wait_for_upstream,
         provide_context=True,
         execution_timeout=timedelta(minutes=2),
     )
     
-    process = PythonOperator(
+    process_task = PythonOperator(
         task_id="process_data",
         python_callable=process_data,
         provide_context=True,
     )
     
-    check_upstream >> wait_for_upstream >> process
+    check_upstream_task >> wait_for_upstream_task >> process_task
