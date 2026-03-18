@@ -8,7 +8,6 @@ args = getResolvedOptions(
     sys.argv,
     [
         "JOB_NAME",
-        "S3_BUCKET",
         "REDSHIFT_SCHEMA",
         "REDSHIFT_CONNECTION_NAME",
         "TempDir",
@@ -21,7 +20,7 @@ spark = glue_context.spark_session
 job = Job(glue_context)
 job.init(args["JOB_NAME"], args)
 
-bucket = args["S3_BUCKET"]
+bucket = args.get("S3_BUCKET", "dms-data-bucket")
 schema = args["REDSHIFT_SCHEMA"]
 conn_name = args["REDSHIFT_CONNECTION_NAME"]
 tmp_dir = args["TempDir"]
