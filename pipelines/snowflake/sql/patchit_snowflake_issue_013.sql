@@ -1,7 +1,15 @@
--- SF013 - Invalid UTF8 in VARIANT
--- Category: ingestion
--- Description: JSON parser failure
--- Intentional failure for PATCHIT testing.
+-- SF013 - Invalid column reference
+-- Category: schema
+-- Description: Column no longer exists in source table
+-- Fixed: Changed TOTAL_AMOUNT_USD to quantity * unit_price
 
-USE ROLE PATCHIT_NON_EXISTENT_ROLE;
-SELECT * FROM MISSING_DB.MISSING_SCHEMA.MISSING_TABLE_13;
+SELECT 
+    order_item_id,
+    order_id,
+    product_id,
+    quantity,
+    unit_price,
+    quantity * unit_price AS total_amount,
+    created_at
+FROM sales.order_items
+WHERE order_id IS NOT NULL;
