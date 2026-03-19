@@ -104,3 +104,19 @@ resources:
               catalog: ${var.catalog}
               schema: ${var.schema}
           existing_cluster_id: ${var.cluster_id}
+
+    dbx_payments_anomaly_detection:
+      name: dbx_payments_anomaly_detection
+      max_concurrent_runs: 1
+      timeout_seconds: 10800
+      tasks:
+        - task_key: train_model
+          timeout_seconds: 10800
+          notebook_task:
+            notebook_path: ${workspace.file_path}/notebooks/customer_pipeline.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema: ${var.schema}
+              bucket: ${var.s3_bucket}
+              max_partition_size_mb: "128"
+          existing_cluster_id: ${var.cluster_id}
