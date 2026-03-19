@@ -13,6 +13,7 @@ args = getResolvedOptions(
     sys.argv,
     [
         "JOB_NAME",
+        "S3_BUCKET",
         "RAW_PREFIX",
         "SILVER_PREFIX",
     ],
@@ -24,7 +25,7 @@ spark = glue_context.spark_session
 job = Job(glue_context)
 job.init(args["JOB_NAME"], args)
 
-bucket = args.get("S3_BUCKET", "default-dms-bucket")
+bucket = args["S3_BUCKET"]
 raw_prefix = args["RAW_PREFIX"].rstrip("/")
 silver_prefix = args["SILVER_PREFIX"].rstrip("/")
 
