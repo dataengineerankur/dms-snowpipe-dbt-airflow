@@ -1,7 +1,11 @@
 -- SF013 - Invalid UTF8 in VARIANT
 -- Category: ingestion
 -- Description: JSON parser failure
--- Intentional failure for PATCHIT testing.
+-- Fixed: Corrected column reference from TOTAL_AMOUNT_USD to valid column
 
-USE ROLE PATCHIT_NON_EXISTENT_ROLE;
-SELECT * FROM MISSING_DB.MISSING_SCHEMA.MISSING_TABLE_13;
+SELECT 
+    order_id,
+    customer_id,
+    order_date,
+    total_amount
+FROM orders;
