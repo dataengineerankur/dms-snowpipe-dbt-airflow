@@ -444,6 +444,21 @@ resource "aws_iam_role_policy" "glue_s3" {
           aws_s3_bucket.dms.arn,
           "${aws_s3_bucket.dms.arn}/*"
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:GetObjectVersion",
+          "s3:ListBucket",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:AbortMultipartUpload"
+        ]
+        Resource = [
+          "arn:aws:s3:::analytics-curated",
+          "arn:aws:s3:::analytics-curated/*"
+        ]
       }
     ]
   })
