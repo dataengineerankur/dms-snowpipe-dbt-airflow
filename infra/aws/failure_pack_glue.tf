@@ -36,6 +36,10 @@ resource "aws_glue_job" "patchit_failure_pack" {
     "--job-language"            = "python"
     "--enable-glue-datacatalog" = "true"
     "--TempDir"                 = "s3://${aws_s3_bucket.dms.bucket}/glue/tmp/"
+    "--S3_BUCKET"               = aws_s3_bucket.dms.bucket
+    "--RAW_PREFIX"              = var.raw_prefix
+    "--SILVER_PREFIX"           = var.silver_prefix
+    "--GOLD_PREFIX"             = var.gold_prefix
     "--PATCHIT_FAILURE_PACK"    = "true"
     "--ISSUE_ID"                = upper(each.key)
   }
