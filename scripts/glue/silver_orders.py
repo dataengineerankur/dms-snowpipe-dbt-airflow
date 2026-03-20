@@ -19,6 +19,7 @@ args = getResolvedOptions(
 sc = SparkContext.getOrCreate()
 glue_context = GlueContext(sc)
 spark = glue_context.spark_session
+spark.conf.set("spark.sql.adaptive.enabled", "true")
 job = Job(glue_context)
 job.init(args["JOB_NAME"], args)
 
