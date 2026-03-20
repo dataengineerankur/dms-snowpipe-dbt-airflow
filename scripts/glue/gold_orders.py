@@ -33,6 +33,11 @@ gold_prefix = optional_args.get("GOLD_PREFIX", os.environ.get("GOLD_PREFIX", "go
 orders = spark.read.parquet(f"s3://{bucket}/{silver_prefix}/orders/")
 order_items = spark.read.parquet(f"s3://{bucket}/{silver_prefix}/order_items/")
 
+orders_summary = orders.select("order_id", "customer_id", "order_amount")
+orders_summary.write.mode("overwrite").parquet(
+    f"s3://{bucket}/{gold_prefix}/orders_summary/"
+)
+
 items_agg = (
     order_items.groupBy("order_id")
     .agg(
