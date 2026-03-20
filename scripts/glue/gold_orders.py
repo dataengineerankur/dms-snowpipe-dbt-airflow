@@ -49,6 +49,7 @@ fct_orders = (
         orders.customer_id,
         orders.order_status,
         orders.order_date,
+        orders.order_amount,
         orders.updated_at.alias("order_updated_at"),
         F.coalesce(items_agg.total_items, F.lit(0)).alias("total_items"),
         F.coalesce(items_agg.gross_revenue, F.lit(0)).alias("gross_revenue"),
