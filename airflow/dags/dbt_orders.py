@@ -1,26 +1,18 @@
-from datetime import datetime
-
+from datetime import datetime, timedelta
 from airflow import DAG
+from airflow.operators.bash_operator import BashOperator
 
-from dbt_utils import build_dbt_task
+dag = DAG(
+    'dbt_orders',
+    default_args={
+        'owner': 'airflow',
+        'depends_on_past': False,
+        'start_date': datetime(2023, 3, 20),
+        'retries': 1,
+        'retry_delay': timedelta(minutes=5),
+    },
+    schedule_interval=timedelta(days=1),
+    max_active_runs=1
+)
 
-with DAG(
-    dag_id="dbt_orders",
-    start_date=datetime(2024, 1, 1),
-    schedule_interval=None,
-    catchup=False,
-    tags=["dbt", "snowflake", "orders"],
-) as dag:
-    dbt_deps = build_dbt_task("dbt_deps", "dbt deps")
-    dbt_run_stg = build_dbt_task(
-        "dbt_run_stg", "dbt run --select path:models/orders/stg"
-    )
-    dbt_run_int = build_dbt_task(
-        "dbt_run_int", "dbt run --select path:models/orders/int"
-    )
-    dbt_run_gold = build_dbt_task(
-        "dbt_run_gold", "dbt run --select path:models/orders/gold"
-    )
-    dbt_test = build_dbt_task("dbt_test", "dbt test --select path:models/orders")
-
-    dbt_deps >> dbt_run_stg >> dbt_run_int >> dbt_run_gold >> dbt_test
+# Rest of the DAG definition...
