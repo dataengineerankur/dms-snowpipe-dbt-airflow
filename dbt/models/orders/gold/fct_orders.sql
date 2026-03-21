@@ -43,7 +43,7 @@ SELECT * FROM final
 {% if is_incremental() %}
 WHERE RECORD_UPDATED_AT >= DATEADD(
   day,
-  -{{ var('fct_orders_lookback_days') }},
+  -{{ var('fct_orders_lookback_days', 3) }},
   (SELECT COALESCE(MAX(RECORD_UPDATED_AT), '1970-01-01') FROM {{ this }})
 )
 {% endif %}
