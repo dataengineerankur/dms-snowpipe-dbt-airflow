@@ -1,11 +1,18 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from airflow import DAG
 
 from dbt_utils import build_dbt_task
 
+default_args = {
+    "retries": 1,
+    "retry_delay": timedelta(minutes=5),
+    "email_on_failure": True,
+}
+
 with DAG(
     dag_id="dbt_customers",
+    default_args=default_args,
     start_date=datetime(2024, 1, 1),
     schedule_interval=None,
     catchup=False,
