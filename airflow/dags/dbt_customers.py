@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from airflow import DAG
 
@@ -10,6 +10,13 @@ with DAG(
     schedule_interval=None,
     catchup=False,
     tags=["dbt", "snowflake", "customers"],
+    default_args={
+        "owner": "data-engineering",
+        "retries": 1,
+        "retry_delay": timedelta(minutes=5),
+        "email_on_failure": True,
+        "email": ["data-alerts@company.com"],
+    },
 ) as dag:
     dbt_deps = build_dbt_task("dbt_deps", "dbt deps")
     dbt_run_stg = build_dbt_task(
