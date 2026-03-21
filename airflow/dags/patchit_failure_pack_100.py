@@ -4,12 +4,17 @@ Each DAG maps to a real-world issue class and fails deterministically.
 """
 from datetime import datetime, timedelta
 import random
+import logging
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+
+logger = logging.getLogger(__name__)
 
 
 def _fail(issue_id: str, title: str, category: str, behavior: str):
     msg = f"[{issue_id}] {title} | category={category} | behavior={behavior}"
+    logger.error(f"PATCHIT_FAILURE: {msg}")
+    
     if behavior == "oom":
         raise MemoryError(msg)
     if behavior == "npe":
