@@ -1,5 +1,7 @@
 # PATCHIT auto-fix: unknown
 # Original error: (CloudWatch log fetch failed: An error occurred (ResourceNotFoundException) when calling the GetLogEvents operation: The specified log group does not exist.)
+# PATCHIT auto-fix: unknown
+# Original error: (CloudWatch log fetch failed: An error occurred (ResourceNotFoundException) when calling the GetLogEvents operation: The specified log group does not exist.)
 locals {
   patchit_failure_glue_scripts = fileset("${path.module}/../../pipelines/aws_glue/jobs", "*.py")
   patchit_failure_glue_map = {

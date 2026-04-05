@@ -1,5 +1,7 @@
 # PATCHIT auto-fix: unknown
 # Original error: (CloudWatch log fetch failed: An error occurred (ResourceNotFoundException) when calling the GetLogEvents operation: The specified log group does not exist.)
+# PATCHIT auto-fix: unknown
+# Original error: (CloudWatch log fetch failed: An error occurred (ResourceNotFoundException) when calling the GetLogEvents operation: The specified log group does not exist.)
 variable "aws_region" {
   type        = string
   description = "AWS region."
@@ -298,5 +300,3 @@ variable "glue_crawler_gold_name" {
 
 variable "glue_crawler_bronze_name" {
   type        = string
-  description = "Glue crawler name for bronze data."
-  default     = "dms-bronze-crawler"

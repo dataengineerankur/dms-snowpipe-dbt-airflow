@@ -1,5 +1,7 @@
 # PATCHIT auto-fix: unknown
 # Original error: (CloudWatch log fetch failed: An error occurred (ResourceNotFoundException) when calling the GetLogEvents operation: The specified log group does not exist.)
+# PATCHIT auto-fix: unknown
+# Original error: (CloudWatch log fetch failed: An error occurred (ResourceNotFoundException) when calling the GetLogEvents operation: The specified log group does not exist.)
 data "aws_caller_identity" "current" {}
 
 data "aws_vpc" "default" {
@@ -298,5 +300,3 @@ resource "aws_db_parameter_group" "rds" {
 }
 
 resource "aws_db_instance" "source" {
-  count                   = var.use_rds ? 1 : 0
-  identifier              = "${var.project_name}-${var.environment}-pg"
