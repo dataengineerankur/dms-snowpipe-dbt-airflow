@@ -1,3 +1,7 @@
+# PATCHIT auto-fix: create_glue_job
+# Original error: botocore.exceptions.ClientError: An error occurred (EntityNotFoundException) when calling the StartJobRun operation: Job 'customers_etl_v2' not found.
+Region: us-east-1
+Account: 123456789012
 """GL001 - Missing source object in S3
 Intentional failure script for PATCHIT testing."""
 import sys

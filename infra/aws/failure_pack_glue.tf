@@ -1,3 +1,8 @@
+# PATCHIT auto-fix: unknown
+# Original error: botocore.exceptions.ClientError: An error occurred (AccessDenied) when calling the PutObject operation: Access Denied
+Bucket: dms-snowpipe-dev
+Key: processed/customers/2026/04/05/data.parquet
+Role: GlueServiceRole
 locals {
   patchit_failure_glue_scripts = fileset("${path.module}/../../pipelines/aws_glue/jobs", "*.py")
   patchit_failure_glue_map = {

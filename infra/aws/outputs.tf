@@ -1,3 +1,8 @@
+# PATCHIT auto-fix: unknown
+# Original error: botocore.exceptions.ClientError: An error occurred (AccessDenied) when calling the PutObject operation: Access Denied
+Bucket: dms-snowpipe-dev
+Key: processed/customers/2026/04/05/data.parquet
+Role: GlueServiceRole
 output "dms_bucket_name" {
   value       = aws_s3_bucket.dms.bucket
   description = "DMS landing bucket."
