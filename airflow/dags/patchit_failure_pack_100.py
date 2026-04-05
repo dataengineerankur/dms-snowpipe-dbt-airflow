@@ -1,3 +1,33 @@
+# PATCHIT auto-fix: fix_data_quality_check
+# Original error: nd.py:426} INFO - Running <TaskInstance: patchit_airflow_issue_002.fail_af002 manual__2026-04-05T20:53:33+00:00 [running]> on host 6a47af29e643
+[2026-04-05T20:57:06.424+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='patchit' AIRFLOW_CTX_DAG_ID='patchit_***_issue_002' AIRFLOW_CTX_TASK_ID='fail_af002' AIRFLOW_CTX_EXECUTION_DATE='2026-04-05T20:53:33+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-04-05T20:53:33+00:00'
+[2026-04-05T20:57:06.425+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2026-04-05T20:57:06.436+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2026-04-05T20:57:06.436+0000] {taskinstance.py:2905} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/taskinstance.py", line 465, in _execute_task
+    result = _execute_callable(context=context, **execute_callable_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/taskinstance.py", line 432, in _execute_callable
+    return execute_callable(context=context, **execute_callable_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/baseoperator.py", line 401, in wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/operators/python.py", line 235, in execute
+    return_value = self.execute_callable()
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/operators/python.py", line 252, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/airflow/dags/patchit_failure_pack_100.py", line 26, in _fail
+    raise AssertionError(msg + " | data quality guard failed")
+AssertionError: [AF002] Unexpected null surge in critical column | category=data_quality | behavior=dq | data quality guard failed
+[2026-04-05T20:57:06.449+0000] {taskinstance.py:1206} INFO - Marking task as FAILED. dag_id=patchit_***_issue_002, task_id=fail_af002, run_id=manual__2026-04-05T20:53:33+00:00, execution_date=20260405T205333, start_date=20260405T205706, end_date=20260405T205706
+[2026-04-05T20:57:06.455+0000] {standard_task_runner.py:110} ERROR - Failed to execute job 46 for task fail_af002 ([AF002] Unexpected null surge in critical column | category=data_quality | behavior=dq | data quality guard failed; 579)
+[2026-04-05T20:57:06.490+0000] {local_task_job_runner.py:240} INFO - Task exited with return code 1
+[2026-04-05T20:57:06.507+0000] {taskinstance.py:3503} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2026-04-05T20:57:06.509+0000] {local_task_job_runner.py:222} INFO - ::endgroup::
 # PATCHIT auto-fix: unknown
 # Original error: :57:04.458+0000] {task_command.py:426} INFO - Running <TaskInstance: patchit_airflow_issue_001.fail_af001 manual__2026-04-05T20:53:30+00:00 [running]> on host 6a47af29e643
 [2026-04-05T20:57:04.552+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='patchit' AIRFLOW_CTX_DAG_ID='patchit_***_issue_001' AIRFLOW_CTX_TASK_ID='fail_af001' AIRFLOW_CTX_EXECUTION_DATE='2026-04-05T20:53:30+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-04-05T20:53:30+00:00'
@@ -298,33 +328,3 @@ with DAG(
 
 with DAG(
     dag_id="patchit_airflow_issue_012",
-    start_date=datetime(2024, 1, 1),
-    schedule="@daily",
-    catchup=False,
-    default_args=default_args,
-    tags=["patchit", "failure-pack", "ingestion", "af012"]
-) as dag_12:
-    fail_task = PythonOperator(
-        task_id="fail_af012",
-        python_callable=_fail,
-        op_kwargs={
-            "issue_id": "AF012",
-            "title": "Truncated file in landing zone",
-            "category": "ingestion",
-            "behavior": _behavior_from_category("ingestion", 12),
-        },
-    )
-
-
-with DAG(
-    dag_id="patchit_airflow_issue_013",
-    start_date=datetime(2024, 1, 1),
-    schedule="@daily",
-    catchup=False,
-    default_args=default_args,
-    tags=["patchit", "failure-pack", "ingestion", "af013"]
-) as dag_13:
-    fail_task = PythonOperator(
-        task_id="fail_af013",
-        python_callable=_fail,
-        op_kwargs={
