@@ -24,7 +24,7 @@ bucket = args["S3_BUCKET"]
 silver_prefix = args["SILVER_PREFIX"].rstrip("/")
 gold_prefix = args["GOLD_PREFIX"].rstrip("/")
 
-products = spark.read.parquet(f"s3://{bucket}/{silver_prefix}/stg_products/")
+products = spark.read.parquet(f"s3://{bucket}/{silver_prefix}/products/")
 
 dim_products = products.select(
     "product_id", "sku", "product_name", "category", "price", "created_at", "updated_at"

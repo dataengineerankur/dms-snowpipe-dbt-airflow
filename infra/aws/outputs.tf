@@ -109,7 +109,7 @@ output "glue_catalog_database_gold" {
 }
 
 output "glue_crawler_raw_name" {
-  value       = var.enable_glue_athena ? aws_glue_crawler.raw[0].name : ""
+  value       = var.enable_glue_athena ? var.glue_crawler_raw_name : ""
   description = "Glue crawler name for raw data."
 }
 

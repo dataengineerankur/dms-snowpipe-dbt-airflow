@@ -24,7 +24,7 @@ bucket = args["S3_BUCKET"]
 silver_prefix = args["SILVER_PREFIX"].rstrip("/")
 gold_prefix = args["GOLD_PREFIX"].rstrip("/")
 
-customers = spark.read.parquet(f"s3://{bucket}/{silver_prefix}/stg_customers/")
+customers = spark.read.parquet(f"s3://{bucket}/{silver_prefix}/customers/")
 
 dim_customers = customers.select(
     "customer_id", "first_name", "last_name", "email", "created_at", "updated_at"

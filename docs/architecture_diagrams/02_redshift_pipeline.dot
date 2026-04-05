@@ -1,0 +1,59 @@
+digraph redshift_pipeline {
+  graph [
+    label="Pipeline 2: Postgres to Amazon Redshift",
+    labelloc=t,
+    labeljust=l,
+    fontsize=24,
+    fontname="Helvetica-Bold",
+    bgcolor="#0b1020",
+    rankdir=LR,
+    nodesep=0.55,
+    ranksep=0.9,
+    pad=0.35,
+    splines=polyline
+  ];
+
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, color="#1e293b", penwidth=1.2, margin="0.18,0.12"];
+  edge [color="#93c5fd", penwidth=1.8, arrowsize=0.8, fontname="Helvetica", fontsize=10, fontcolor="#e2e8f0"];
+
+  subgraph cluster_source {
+    label="Operational Source";
+    color="#334155"; style="rounded,filled"; fillcolor="#111827";
+    postgres [label="Postgres\nOLTP system\nTransactional source tables", fillcolor="#38bdf8", fontcolor="#082f49"];
+  }
+
+  subgraph cluster_ingest {
+    label="Replication and Storage";
+    color="#334155"; style="rounded,filled"; fillcolor="#111827";
+    dms [label="AWS DMS\nFull load + CDC", fillcolor="#f59e0b", fontcolor="#451a03"];
+    s3_stage [label="Amazon S3 Stage\nLanding zone for replicated files", fillcolor="#86efac", fontcolor="#052e16"];
+  }
+
+  subgraph cluster_transform {
+    label="Transformation Layer";
+    color="#334155"; style="rounded,filled"; fillcolor="#111827";
+    glue [label="AWS Glue / Spark ETL\nStandardize files\nApply business rules\nPrepare warehouse loads", fillcolor="#c4b5fd", fontcolor="#2e1065"];
+    rs_stage [label="Redshift Staging\nRaw/stage tables", fillcolor="#fca5a5", fontcolor="#450a0a"];
+    rs_core [label="Redshift Core Model\nConformed dimensions\nCurated facts", fillcolor="#fde68a", fontcolor="#422006"];
+    rs_marts [label="Redshift Data Marts\nSubject-oriented reporting tables", fillcolor="#fef3c7", fontcolor="#422006"];
+  }
+
+  subgraph cluster_control {
+    label="Scheduling and Consumption";
+    color="#334155"; style="rounded,filled"; fillcolor="#111827";
+    scheduler [label="Scheduler / Orchestrator\nAirflow or Glue schedule\nControls ETL sequencing\nand warehouse refresh windows", fillcolor="#67e8f9", fontcolor="#083344"];
+    consumers [label="Consumers\nPower BI / Tableau\nSQL analysts\nBusiness reporting", fillcolor="#a7f3d0", fontcolor="#022c22"];
+  }
+
+  postgres -> dms [label="CDC replication"];
+  dms -> s3_stage [label="persist extracted changes"];
+  s3_stage -> glue [label="ETL input"];
+  glue -> rs_stage [label="load stage tables"];
+  rs_stage -> rs_core [label="transform and model"];
+  rs_core -> rs_marts [label="publish marts"];
+  rs_marts -> consumers [label="serve queries"];
+
+  scheduler -> glue [style=dashed, color="#22d3ee", label="job schedule"];
+  scheduler -> rs_core [style=dashed, color="#a78bfa", label="load dependencies"];
+  scheduler -> rs_marts [style=dashed, color="#facc15", label="mart refresh"];
+}

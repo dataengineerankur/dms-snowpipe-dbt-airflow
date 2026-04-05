@@ -1,0 +1,2 @@
+{{ config(materialized='table', schema='GOLD') }}
+select o.order_id, o.customer_id, o.amount, o.order_status as current_status, snap.order_status as historical_status, snap.dbt_valid_from, snap.dbt_valid_to, datediff('hour', snap.dbt_valid_from, coalesce(snap.dbt_valid_to, current_timestamp)) as hours_in_status from {{ ref('uni_silver_orders') }} o join {{ ref('snp_orders_status') }} snap on o.order_id = snap.order_id order by o.order_id, snap.dbt_valid_from

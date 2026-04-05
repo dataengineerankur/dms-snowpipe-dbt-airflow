@@ -12,12 +12,14 @@ x-airflow-common:
     AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "false"
     AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY:-}
     AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY:-}
-    PIP_ADDITIONAL_REQUIREMENTS: "apache-airflow-providers-docker==3.8.0 apache-airflow-providers-amazon==8.26.0"
+    PIP_ADDITIONAL_REQUIREMENTS: "apache-airflow-providers-docker==3.8.0 apache-airflow-providers-amazon==8.26.0 apache-airflow-providers-snowflake==5.7.1 snowflake-connector-python==3.12.2 snowflake-snowpark-python==1.24.0 pandas==2.3.3 scikit-learn==1.6.1 pyarrow==17.0.0"
     DBT_IMAGE: ${DBT_IMAGE:-dms-dbt-runner:latest}
     DBT_EXECUTION_MODE: ${DBT_EXECUTION_MODE:-local}
+    PROJECT_ROOT: ${PROJECT_ROOT:-/opt/project}
   volumes:
     - ./dags:/opt/airflow/dags
     - ./plugins:/opt/airflow/plugins
+    - ..:/opt/project
   user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
 
 services:

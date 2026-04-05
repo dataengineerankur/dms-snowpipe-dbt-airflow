@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Snowflake University Runbook</title>
+<style>
+:root{--bg:#06101c;--line:rgba(145,185,255,.18);--text:#f4f8ff;--muted:#9fb0ce;--cyan:#4ccfff;--blue:#6d8fff;--pink:#ff7bc8;--green:#53e2a0;--gold:#ffcb57;--r:16px;--shadow:0 20px 60px rgba(0,0,0,.35)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#06101c,#030a14);min-height:100vh}
+body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(100,140,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(100,140,255,.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.layout{display:grid;grid-template-columns:minmax(220px,280px) 1fr;min-height:100vh;position:relative;z-index:1}
+aside{position:sticky;top:0;align-self:start;max-height:100vh;overflow:auto;padding:20px;border-right:1px solid var(--line);background:rgba(4,10,22,.92);backdrop-filter:blur(12px)}
+aside h1{font-size:1rem;margin:0 0 12px;letter-spacing:.06em;text-transform:uppercase;color:var(--cyan)}
+aside nav a{display:block;padding:8px 10px;margin:4px 0;border-radius:10px;color:var(--muted);text-decoration:none;font-size:.88rem;border:1px solid transparent}
+aside nav a:hover,aside nav a.active{color:var(--text);background:rgba(76,207,255,.1);border-color:rgba(76,207,255,.25)}
+.toplinks{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.toplinks a{font-size:.78rem;padding:6px 10px;border-radius:999px;border:1px solid var(--line);color:var(--cyan);text-decoration:none}
+.toplinks a:hover{background:rgba(76,207,255,.12)}
+main{padding:28px 32px 80px;max-width:900px}
+article{margin-bottom:48px;padding-bottom:32px;border-bottom:1px solid var(--line);scroll-margin-top:24px}
+article h2{margin:0 0 12px;font-size:1.45rem}
+article h3{margin:20px 0 8px;font-size:1.05rem;color:#cfe7ff}
+article p,article li{color:var(--muted);line-height:1.65;font-size:.95rem}
+article ul{padding-left:1.2rem}
+article strong{color:var(--text)}
+pre{background:rgba(3,8,16,.9);border:1px solid var(--line);border-radius:var(--r);padding:14px;overflow:auto;font-size:.82rem;color:#cde5ff;line-height:1.5}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:12px 0}
+th,td{border:1px solid var(--line);padding:10px;text-align:left;color:var(--muted)}
+th{color:var(--text);background:rgba(255,255,255,.04)}
+@media(max-width:900px){.layout{grid-template-columns:1fr}aside{position:relative;max-height:none;border-right:0;border-bottom:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside>
+<h1>Runbook</h1>
+<div class="toplinks">
+<a href="snowflake_university_visual_guide.html">Visual guide</a>
+<a href="snowflake_university_deep_dive.html">Deep dive</a>
+</div>
+<nav id="nav"><a href="#top">Top</a>
+<a href="#scale">Scale</a>
+<a href="#snowpipe-dms">DMS</a>
+<a href="#retail-stack">Retail</a>
+<a href="#walkthrough">Steps</a>
+<a href="#step-01">Step 1</a>
+<a href="#step-02">Step 2</a>
+<a href="#step-03">Step 3</a>
+<a href="#step-04">Step 4</a>
+<a href="#step-05">Step 5</a>
+<a href="#step-06">Step 6</a>
+<a href="#step-07">Step 7</a>
+<a href="#step-08">Step 8</a>
+<a href="#step-09">Step 9</a>
+<a href="#step-10">Step 10</a>
+<a href="#step-11">Step 11</a>
+<a href="#step-12">Step 12</a>
+<a href="#step-13">Step 13</a>
+<a href="#step-14">Step 14</a>
+<a href="#step-15">Step 15</a>
+<a href="#step-16">Step 16</a>
+<a href="#step-17">Step 17</a>
+<a href="#step-18">Step 18</a>
+<a href="#airflow-path">Airflow</a>
+<a href="#observe">Observe</a>
+<a href="#local">Local</a></nav>
+</aside>
+<main>
+<article id="top">
+<h2>Snowflake University Runbook</h2>
+<p>Interactive HTML runbook. Use the sidebar to jump. <a href="snowflake_university_deep_dive.html">Deep dive (HTML)</a> · <a href="snowflake_university_visual_guide.html#architecture">Visual guide — architecture</a></p>
+</article>
+<article id="links">
+<h2>Related</h2>
+<ul>
+<li><a href="snowflake_university_visual_guide.html#architecture">Architecture map (buttons per component)</a></li>
+<li><a href="snowflake_university_deep_dive.md">Deep dive (Markdown)</a></li>
+<li><a href="snowflake_iceberg_lab.md">Iceberg lab</a></li>
+</ul>
+</article>
+<article id="scale">
+<h2>Current scale behavior</h2>
+<ul>
+<li><code>scripts/00_create_foundation_dataset.sql</code> defaults to full scale.</li>
+<li>Edit <code>SET</code> row targets for smaller dev runs.</li>
+</ul>
+</article>
+<article id="snowpipe-dms">
+<h2>DMS · Snowpipe · dbt</h2>
+<p>See repo <code>README.md</code>, <code>infra/snowflake/</code>, <code>scripts/verify_snowpipe.sql</code>. dbt: <code>cd dbt && DBT_PROFILES_DIR=. ../.venv-snowflake/bin/dbt run --select gold</code>.</p>
+</article>
+<article id="retail-stack">
+<h2>Retail live stack</h2>
+<p><code>./scripts/start_retail_stack.sh</code> · UI :8502 · Airflow :8080 · DAG <code>retail_raw_to_bronze</code></p>
+</article>
+<article id="walkthrough">
+<h2>Manual walkthrough</h2>
+<h3 id="step-01">Step 1</h3><p><code>scripts/00_create_foundation_dataset.sql</code></p>
+<h3 id="step-02">Step 2</h3><p><code>scripts/01_transient_tables.sql</code></p>
+<h3 id="step-03">Step 3</h3><p><code>scripts/02_streams.sql — once, to create streams</code></p>
+<h3 id="step-04">Step 4</h3><p><code>scripts/02_streams_trigger_changes.sql</code></p>
+<h3 id="step-05">Step 5</h3><p><code>scripts/02_streams_consume.sql</code></p>
+<h3 id="step-06">Step 6</h3><p><code>scripts/03_tasks.sql</code></p>
+<h3 id="step-07">Step 7</h3><p><code>Optional: EXECUTE TASK AUDIT_DB.PUBLIC.ROOT_TASK_INGEST;</code></p>
+<h3 id="step-08">Step 8</h3><p><code>scripts/04_dynamic_tables.sql</code></p>
+<h3 id="step-09">Step 9</h3><p><code>scripts/05_materialized_views.sql</code></p>
+<h3 id="step-10">Step 10</h3><p><code>PYTHONPATH=$(pwd) .venv-snowflake/bin/python snowpark/snowpark_pipelines.py</code></p>
+<h3 id="step-11">Step 11</h3><p><code>cd dbt &amp;&amp; DBT_PROFILES_DIR=. ../.venv-snowflake/bin/dbt snapshot --select snp_products snp_customers snp_orders_status</code></p>
+<h3 id="step-12">Step 12</h3><p><code>scripts/08_trigger_snapshot_changes.sql</code></p>
+<h3 id="step-13">Step 13</h3><p><code>cd dbt &amp;&amp; DBT_PROFILES_DIR=. ../.venv-snowflake/bin/dbt snapshot --select snp_products snp_customers snp_orders_status again</code></p>
+<h3 id="step-14">Step 14</h3><p><code>cd dbt &amp;&amp; DBT_PROFILES_DIR=. ../.venv-snowflake/bin/dbt run --select university+ orders_with_status_history</code></p>
+<h3 id="step-15">Step 15</h3><p><code>scripts/09_clustering_benchmark.sql</code></p>
+<h3 id="step-16">Step 16</h3><p><code>scripts/10_internals_deep_dive.sql</code></p>
+<h3 id="step-17">Step 17</h3><p><code>scripts/12_external_tables_and_lake_patterns.sql — needs S3_DMS_INT + dms/sales/orders/</code></p>
+<h3 id="step-18">Step 18</h3><p><code>scripts/11_iceberg_s3_lab.sql — see snowflake_iceberg_lab.md</code></p>
+</article>
+<article id="airflow-path"><h2>Airflow end-to-end</h2><ol>
+<li><code>scripts/02_streams.sql</code> at least once</li>
+<li><code>scripts/02_streams_trigger_changes.sql</code> before DAG</li>
+<li><code>airflow dags trigger snowflake_master_pipeline</code></li>
+<li>Branch <code>consume_stream_delta</code></li>
+<li>Optional <code>task_dag_pipeline</code></li>
+</ol></article>
+<article id="observe"><h2>What to observe</h2><ul>
+<li>Streams, tasks, DTs, MVs, snapshots, external tables (see Markdown runbook)</li>
+</ul></article>
+<article id="local"><h2>Local</h2><ul><li><code>.venv-snowflake</code></li><li><code>airflow/docker-compose.yml</code></li></ul></article>
+</main>
+</div>
+<script>
+const nav=document.getElementById('nav');
+const links=[...nav.querySelectorAll('a')];
+const map=new Map(links.map(a=>[a.getAttribute('href').slice(1),a]));
+const obs=new IntersectionObserver((ents)=>{
+ents.forEach(e=>{
+if(!e.isIntersecting)return;
+const id=e.target.id;if(!id)return;
+links.forEach(l=>l.classList.remove('active'));
+const a=map.get(id);if(a)a.classList.add('active');
+});
+},{rootMargin:'-15% 0px -65% 0px',threshold:0});
+document.querySelectorAll('main [id]').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

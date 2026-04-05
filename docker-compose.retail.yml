@@ -1,0 +1,171 @@
+x-retail-airflow-common: &retail-airflow-common
+  image: apache/airflow:2.9.2
+  environment:
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "false"
+    AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY:-m2fY3CnOnnI-BqSdzdrIW6DCeU44yWiNys8lm2SleqE=}
+    AIRFLOW__WEBSERVER__SECRET_KEY: retail-secret-key-demo
+    PIP_ADDITIONAL_REQUIREMENTS: apache-airflow-providers-amazon==8.26.0 boto3==1.35.24 pandas==2.2.2 pyarrow==17.0.0
+    AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+    AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+    AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+    AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-us-east-1}
+    RETAIL_S3_BUCKET: ${RETAIL_S3_BUCKET}
+    RETAIL_RAW_PREFIX: ${RETAIL_RAW_PREFIX:-retail-live/raw/transactions}
+    RETAIL_BRONZE_PREFIX: ${RETAIL_BRONZE_PREFIX:-retail-live/bronze/transactions}
+  volumes:
+    - ./airflow/dags:/opt/airflow/dags
+  user: "${AIRFLOW_UID:-50000}:0"
+
+services:
+  redpanda:
+    image: redpandadata/redpanda:v24.2.8
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp=1
+      - --memory=1G
+      - --reserve-memory=0M
+      - --node-id=0
+      - --check=false
+      - --kafka-addr=PLAINTEXT://0.0.0.0:9092,OUTSIDE://0.0.0.0:19092
+      - --advertise-kafka-addr=PLAINTEXT://redpanda:9092,OUTSIDE://localhost:19092
+      - --pandaproxy-addr=0.0.0.0:8082
+      - --advertise-pandaproxy-addr=redpanda:8082
+    ports:
+      - "19092:19092"
+      - "8082:8082"
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redpanda-console:
+    image: docker.redpanda.com/redpandadata/console:v2.7.2
+    environment:
+      KAFKA_BROKERS: redpanda:9092
+    restart: unless-stopped
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    ports:
+      - "8081:8080"
+
+  retail-api:
+    image: python:3.11-slim
+    working_dir: /app
+    command: sh -lc "pip install --no-cache-dir -r requirements-retail-app.txt && uvicorn retail_api:app --app-dir python --host 0.0.0.0 --port 8001"
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
+      RETAIL_KAFKA_TOPIC: retail.transactions.raw
+      RETAIL_S3_BUCKET: ${RETAIL_S3_BUCKET}
+      RETAIL_RAW_PREFIX: ${RETAIL_RAW_PREFIX:-retail-live/raw/transactions}
+      RETAIL_BRONZE_PREFIX: ${RETAIL_BRONZE_PREFIX:-retail-live/bronze/transactions}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-us-east-1}
+      RETAIL_UI_URL: http://localhost:8502
+      REDPANDA_CONSOLE_URL: http://localhost:8081
+    volumes:
+      - ./:/app
+    restart: unless-stopped
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    ports:
+      - "8001:8001"
+
+  retail-ui:
+    image: python:3.11-slim
+    working_dir: /app
+    command: sh -lc "pip install --no-cache-dir -r requirements-retail-app.txt && streamlit run ui/retail_app.py --server.port 8502 --server.address 0.0.0.0"
+    environment:
+      RETAIL_API_URL: http://retail-api:8001
+    volumes:
+      - ./:/app
+    restart: unless-stopped
+    depends_on:
+      - retail-api
+    ports:
+      - "8502:8502"
+
+  spark-streaming:
+    image: apache/spark:3.5.1
+    working_dir: /app
+    command: >-
+      sh -lc "mkdir -p /tmp/ivy/cache /tmp/ivy/jars /opt/retail/runtime/checkpoints &&
+      /opt/spark/bin/spark-submit
+      --conf spark.jars.ivy=/tmp/ivy
+      --conf spark.ui.port=4040
+      --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1,org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262
+      /app/streaming/retail_streaming.py"
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
+      RETAIL_KAFKA_TOPIC: retail.transactions.raw
+      RETAIL_S3_BUCKET: ${RETAIL_S3_BUCKET}
+      RETAIL_RAW_PREFIX: ${RETAIL_RAW_PREFIX:-retail-live/raw/transactions}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-us-east-1}
+      HOME: /tmp
+    volumes:
+      - ./:/app
+      - ./runtime:/opt/retail/runtime
+    ports:
+      - "4040:4040"
+    restart: unless-stopped
+    depends_on:
+      redpanda:
+        condition: service_healthy
+
+  airflow-postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  airflow-init:
+    <<: *retail-airflow-common
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow db migrate && \
+        airflow users create --username admin --password admin --firstname Retail --lastname Admin --role Admin --email admin@example.com
+    depends_on:
+      airflow-postgres:
+        condition: service_healthy
+
+  airflow-webserver:
+    <<: *retail-airflow-common
+    command: webserver
+    depends_on:
+      airflow-postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+    ports:
+      - "8080:8080"
+
+  airflow-scheduler:
+    <<: *retail-airflow-common
+    command: scheduler
+    depends_on:
+      airflow-postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully

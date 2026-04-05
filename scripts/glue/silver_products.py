@@ -1,10 +1,18 @@
+import os
 import sys
+
+# PyDeequ reads SPARK_VERSION before running; AWS Glue 4.0 uses Spark 3.3.x
+os.environ.setdefault("SPARK_VERSION", "3.3")
+
 from awsglue.context import GlueContext
 from awsglue.job import Job
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from pyspark.sql import functions as F
 from pyspark.sql.window import Window
+
+from pydeequ.checks import Check, CheckLevel
+from pydeequ.verification import VerificationSuite
 
 args = getResolvedOptions(
     sys.argv,
@@ -30,8 +38,32 @@ today = F.date_format(F.current_date(), "yyyyMMdd")
 
 
 def read_raw(table):
-    return spark.read.parquet(f"s3://{bucket}/{raw_prefix}/sales/{table}/")
+    return (
+        spark.read.option("recursiveFileLookup", "true")
+        .parquet(f"s3://{bucket}/{raw_prefix}/{table}/")
+    )
 
+
+
+
+def run_pydeequ_checks(df, dataset_name, required_cols, key_col=None, non_negative_cols=None):
+    non_negative_cols = non_negative_cols or []
+
+    check = Check(spark, CheckLevel.Error, dataset_name)
+    for c in required_cols:
+        if c in df.columns:
+            check = check.isComplete(c)
+
+    if key_col and key_col in df.columns:
+        check = check.isUnique(key_col)
+
+    for c in non_negative_cols:
+        if c in df.columns:
+            check = check.satisfies(f"{c} >= 0", f"{c}_non_negative")
+
+    result = VerificationSuite(spark).onData(df).addCheck(check).run()
+    if result.status != "Success":
+        raise ValueError(f"PyDeequ DQ failed for {dataset_name}: {result.status}")
 
 def dedupe_latest(df, key_col, ts_cols):
     order_cols = [F.col(c).desc_nulls_last() for c in ts_cols if c in df.columns]
@@ -47,9 +79,10 @@ products = dedupe_latest(
     products, "product_id", ["dms_commit_ts", "DMS_COMMIT_TS", "updated_at", "created_at"]
 )
 products = products.withColumn("load_dt", today)
+run_pydeequ_checks(products, "silver_products", ["product_id", "product_name"], key_col="product_id", non_negative_cols=["price"])
 
 products.write.mode("overwrite").parquet(
-    f"s3://{bucket}/{silver_prefix}/stg_products/"
+    f"s3://{bucket}/{silver_prefix}/products/"
 )
 
 job.commit()

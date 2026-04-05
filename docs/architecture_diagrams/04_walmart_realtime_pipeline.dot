@@ -1,0 +1,74 @@
+digraph walmart_realtime_pipeline {
+  graph [
+    label="Pipeline 4: Walmart Real-Time Retail Pipeline",
+    labelloc=t,
+    labeljust=l,
+    fontsize=24,
+    fontname="Helvetica-Bold",
+    bgcolor="#0b1020",
+    rankdir=LR,
+    nodesep=0.55,
+    ranksep=1.0,
+    pad=0.35,
+    splines=polyline
+  ];
+
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, color="#1e293b", penwidth=1.2, margin="0.18,0.12"];
+  edge [color="#93c5fd", penwidth=1.8, arrowsize=0.8, fontname="Helvetica", fontsize=10, fontcolor="#e2e8f0"];
+
+  subgraph cluster_experience {
+    label="User Experience Layer";
+    color="#334155"; style="rounded,filled"; fillcolor="#111827";
+    ui [label="Streamlit UI\nWalmart-style storefront\nCart + checkout + monitoring", fillcolor="#38bdf8", fontcolor="#082f49"];
+    api [label="FastAPI Service\nTransaction API\nValidation + enrichment\nKafka producer", fillcolor="#67e8f9", fontcolor="#083344"];
+  }
+
+  subgraph cluster_streaming {
+    label="Real-Time Event Streaming";
+    color="#334155"; style="rounded,filled"; fillcolor="#111827";
+    kafka [label="Redpanda / Kafka\nTopic: retail.transactions.raw\nLive transaction events", fillcolor="#f59e0b", fontcolor="#451a03"];
+    spark [label="Spark Structured Streaming\nConsumes Kafka topic\nWrites raw JSON events to S3", fillcolor="#c4b5fd", fontcolor="#2e1065"];
+    s3_raw [label="Amazon S3 Raw\nretail-live/raw/transactions/\nJSON event storage", fillcolor="#86efac", fontcolor="#052e16"];
+  }
+
+  subgraph cluster_batch {
+    label="Batch Promotion and Lakehouse Modeling";
+    color="#334155"; style="rounded,filled"; fillcolor="#111827";
+    airflow [label="Airflow DAG\nretail_raw_to_bronze\nSchedule: every 2 minutes\nRaw JSON -> Bronze Parquet", fillcolor="#fca5a5", fontcolor="#450a0a"];
+    s3_bronze [label="Amazon S3 Bronze\nretail-live/bronze/transactions/\nParquet bronze layer", fillcolor="#fecaca", fontcolor="#450a0a"];
+    dbx_job [label="Databricks Job\nretail_transactions_pipeline\nTask 1: retail_bronze_to_silver\nTask 2: retail_silver_to_gold", fillcolor="#fde68a", fontcolor="#422006"];
+    silver_txn [label="Delta Silver\nsilver_transactions\nOne row per transaction", fillcolor="#ddd6fe", fontcolor="#2e1065"];
+    silver_items [label="Delta Silver\nsilver_transaction_items\nOne row per basket line item", fillcolor="#ddd6fe", fontcolor="#2e1065"];
+    dim_customers [label="Delta Gold\ndim_customers\nRetail customer dimension", fillcolor="#a7f3d0", fontcolor="#022c22"];
+    fact_transactions [label="Delta Gold\nfact_transactions\nRetail transaction fact table", fillcolor="#a7f3d0", fontcolor="#022c22"];
+  }
+
+  subgraph cluster_monitoring {
+    label="Monitoring and Operations";
+    color="#334155"; style="rounded,filled"; fillcolor="#111827";
+    spark_ui [label="Spark UI\nStreaming batches\nDriver logs\nQuery progress", fillcolor="#f9a8d4", fontcolor="#500724"];
+    kafka_console [label="Redpanda Console\nTopic health\nMessage visibility", fillcolor="#f9a8d4", fontcolor="#500724"];
+    ui_monitor [label="Streamlit Monitor Tab\nRecent transactions\nKafka counts\nSpark status\nS3 raw/bronze counts", fillcolor="#f9a8d4", fontcolor="#500724"];
+  }
+
+  ui -> api [label="submit checkout"];
+  api -> kafka [label="publish event"];
+  kafka -> spark [label="stream consume"];
+  spark -> s3_raw [label="write raw JSON"];
+  s3_raw -> airflow [label="scheduled pickup"];
+  airflow -> s3_bronze [label="write bronze parquet"];
+  s3_bronze -> dbx_job [label="retail_bronze_to_silver"];
+  dbx_job -> silver_txn [label="task 1 output"];
+  dbx_job -> silver_items [label="task 1 output"];
+  silver_txn -> dbx_job [label="retail_silver_to_gold"];
+  silver_items -> dbx_job [label="retail_silver_to_gold"];
+  dbx_job -> dim_customers [label="task 2 output"];
+  dbx_job -> fact_transactions [label="task 2 output"];
+
+  spark -> spark_ui [style=dashed, color="#f472b6", label="runtime metrics"];
+  kafka -> kafka_console [style=dashed, color="#f472b6", label="topic metrics"];
+  api -> ui_monitor [style=dashed, color="#f472b6", label="recent orders"];
+  spark -> ui_monitor [style=dashed, color="#f472b6", label="stream status"];
+  s3_raw -> ui_monitor [style=dashed, color="#f472b6", label="raw object count"];
+  s3_bronze -> ui_monitor [style=dashed, color="#f472b6", label="bronze object count"];
+}

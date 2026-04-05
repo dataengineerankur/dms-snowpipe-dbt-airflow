@@ -1,3 +1,7 @@
+# PATCHIT auto-fix: unknown
+# Original error: SQL access control error: Insufficient privileges to operate on warehouse COMPUTE_WH
+Role: LOADER_ROLE
+Required: USAGE on WAREHOUSE COMPUTE_WH
 -- SF010 - Primary key not enforced logically
 -- Category: data_quality
 -- Description: duplicates in business key

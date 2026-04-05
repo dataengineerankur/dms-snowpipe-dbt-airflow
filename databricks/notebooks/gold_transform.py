@@ -13,9 +13,13 @@ from pyspark.sql import functions as F
 
 # COMMAND ----------
 
-dbutils.widgets.text("catalog", "main")
+dbutils.widgets.text("catalog", "patchit")
 dbutils.widgets.text("schema", "walmart_lakehouse")
 dbutils.widgets.text("domain", "customers")  # customers | products | orders
+dbutils.widgets.text("aws_secret_scope", "")
+dbutils.widgets.text("aws_access_key_name", "AWS_ACCESS_KEY_ID")
+dbutils.widgets.text("aws_secret_key_name", "AWS_SECRET_ACCESS_KEY")
+dbutils.widgets.text("aws_session_token_name", "AWS_SESSION_TOKEN")
 
 catalog = dbutils.widgets.get("catalog")
 schema = dbutils.widgets.get("schema")
@@ -24,8 +28,38 @@ domain = dbutils.widgets.get("domain").strip().lower()
 if domain not in {"customers", "products", "orders"}:
     raise ValueError(f"Unsupported domain: {domain}")
 
-spark.sql(f"USE CATALOG {catalog}")
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")
+
+
+def configure_s3_access():
+    scope = dbutils.widgets.get("aws_secret_scope").strip()
+    if not scope:
+        return
+    access_key = dbutils.secrets.get(scope, dbutils.widgets.get("aws_access_key_name"))
+    secret_key = dbutils.secrets.get(scope, dbutils.widgets.get("aws_secret_key_name"))
+    try:
+        token = dbutils.secrets.get(scope, dbutils.widgets.get("aws_session_token_name"))
+    except Exception:
+        token = ""
+    def _h(k: str, v: str) -> None:
+        spark.conf.set(f"spark.hadoop.{k}", v)
+
+    _h("fs.s3.awsAccessKeyId", access_key)
+    _h("fs.s3.awsSecretAccessKey", secret_key)
+    _h("fs.s3n.awsAccessKeyId", access_key)
+    _h("fs.s3n.awsSecretAccessKey", secret_key)
+    _h("fs.s3a.access.key", access_key)
+    _h("fs.s3a.secret.key", secret_key)
+    _h("fs.s3a.endpoint", "s3.us-east-1.amazonaws.com")
+    _h("fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider")
+    if token:
+        _h("fs.s3.awsSessionToken", token)
+        _h("fs.s3n.awsSessionToken", token)
+        _h("fs.s3a.session.token", token)
+        _h("fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.TemporaryAWSCredentialsProvider")
+
+
+configure_s3_access()
 
 
 def table_exists(full_name: str) -> bool:

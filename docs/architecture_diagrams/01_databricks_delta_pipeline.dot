@@ -1,0 +1,87 @@
+digraph databricks_delta_pipeline {
+  graph [
+    label="Pipeline 1: Postgres to Delta Lake on Databricks",
+    labelloc=t,
+    labeljust=l,
+    fontsize=24,
+    fontname="Helvetica-Bold",
+    bgcolor="#0f172a",
+    rankdir=LR,
+    nodesep=0.55,
+    ranksep=0.9,
+    pad=0.35,
+    splines=polyline
+  ];
+
+  node [
+    shape=box,
+    style="rounded,filled",
+    fontname="Helvetica",
+    fontsize=12,
+    color="#1e293b",
+    penwidth=1.2,
+    margin="0.18,0.12"
+  ];
+
+  edge [
+    color="#93c5fd",
+    penwidth=1.8,
+    arrowsize=0.8,
+    fontname="Helvetica",
+    fontsize=10,
+    fontcolor="#e2e8f0"
+  ];
+
+  subgraph cluster_source {
+    label="Operational Source";
+    color="#334155";
+    style="rounded,filled";
+    fillcolor="#111827";
+    postgres [label="Postgres\nOLTP source\nSchemas: sales\nTables: customers, products, orders, order_items", fillcolor="#38bdf8", fontcolor="#082f49"];
+  }
+
+  subgraph cluster_ingest {
+    label="Replication and Landing";
+    color="#334155";
+    style="rounded,filled";
+    fillcolor="#111827";
+    dms [label="AWS DMS\nFull load + CDC\nChange capture from Postgres", fillcolor="#f59e0b", fontcolor="#451a03"];
+    s3_raw [label="Amazon S3 Landing\nParquet files\nPath: dms/sales/<table>/load_dt=YYYYMMDD/", fillcolor="#86efac", fontcolor="#052e16"];
+  }
+
+  subgraph cluster_compute {
+    label="Databricks Lakehouse Processing";
+    color="#334155";
+    style="rounded,filled";
+    fillcolor="#111827";
+    bronze_job [label="Databricks Job Task\nbronze_autoloader\nAuto Loader reads new S3 files", fillcolor="#fca5a5", fontcolor="#450a0a"];
+    bronze_delta [label="Delta Bronze Tables\nRaw CDC with ingest metadata\nbronze_customers\nbronze_products\nbronze_orders\nbronze_order_items", fillcolor="#fecaca", fontcolor="#450a0a"];
+    silver_job [label="Databricks Job Task\nsilver_transform\nCDC merge + quality checks", fillcolor="#c4b5fd", fontcolor="#2e1065"];
+    silver_delta [label="Delta Silver Tables\nCurrent-state curated layer\nDeduplicated records\nMerge with deletes", fillcolor="#ddd6fe", fontcolor="#2e1065"];
+    gold_job [label="Databricks Job Task\ngold_transform\nServing model build", fillcolor="#fde68a", fontcolor="#422006"];
+    gold_delta [label="Delta Gold Tables\nFacts and dimensions\nAnalytics-ready Delta tables", fillcolor="#fef3c7", fontcolor="#422006"];
+  }
+
+  subgraph cluster_control {
+    label="Scheduling and Consumption";
+    color="#334155";
+    style="rounded,filled";
+    fillcolor="#111827";
+    databricks_jobs [label="Scheduler / Orchestrator\nDatabricks Jobs\nTask chain:\nbronze -> silver -> gold", fillcolor="#67e8f9", fontcolor="#083344"];
+    consumers [label="Consumers\nBI dashboards\nAd hoc SQL\nData science / ML", fillcolor="#a7f3d0", fontcolor="#022c22"];
+  }
+
+  postgres -> dms [label="replicate source changes"];
+  dms -> s3_raw [label="write parquet batches"];
+  s3_raw -> bronze_job [label="cloudFiles / Auto Loader"];
+  bronze_job -> bronze_delta [label="append bronze Delta"];
+  bronze_delta -> silver_job [label="read bronze"];
+  silver_job -> silver_delta [label="merge current state"];
+  silver_delta -> gold_job [label="read curated silver"];
+  gold_job -> gold_delta [label="publish gold tables"];
+  gold_delta -> consumers [label="serve analytics"];
+
+  databricks_jobs -> bronze_job [style=dashed, color="#22d3ee", label="scheduled task 1"];
+  databricks_jobs -> silver_job [style=dashed, color="#a78bfa", label="scheduled task 2"];
+  databricks_jobs -> gold_job [style=dashed, color="#facc15", label="scheduled task 3"];
+}

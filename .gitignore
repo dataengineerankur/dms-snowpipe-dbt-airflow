@@ -35,3 +35,8 @@ venv/
 
 # Docker
 *.tar
+scripts/patchit/.aws_failure_watcher_state.json
+scripts/patchit/.databricks_failure_watcher_state.json
+
+runtime/*.json
+runtime/*.jsonl

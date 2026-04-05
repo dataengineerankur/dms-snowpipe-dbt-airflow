@@ -154,15 +154,17 @@ Capture the outputs:
 - `storage_aws_iam_user_arn`
 - `pipe_notification_channels`
 
-Update AWS with Snowflake trust + Snowpipe SNS topics:
+Update AWS with Snowflake trust + Snowpipe SQS notification channels:
 
 ```
 cd infra/aws
 # update terraform.tfvars with:
 # snowflake_aws_iam_user_arn, snowflake_external_id
-# snowpipe_sns_topic_arns (from pipe_notification_channels)
+# snowpipe_sqs_queue_arns (from terraform output pipe_notification_channels in infra/snowflake)
 terraform apply
 ```
+
+If Snowpipe copy history is empty, confirm `snowpipe_sqs_queue_arns` still matches `terraform output -json pipe_notification_channels` from `infra/snowflake`—stale queue ARNs send S3 events to the wrong SQS queue.
 
 ## DMS → S3 Verification
 
@@ -259,6 +261,26 @@ The DAG will use `EcsRunTaskOperator` with container name `dbt`.
 - Use env vars or AWS Secrets Manager for Postgres credentials if needed.
 
 ## PATCHIT Test: AWS Step Functions + Glue Failure
+## PATCHIT Automation: AWS Failure Watcher
+
+Run this small watcher to auto-ingest failed Step Function or Glue job runs into PATCHIT.
+It polls AWS every N seconds and calls the ingestion script for any new failures.
+
+```bash
+cd /Users/ankurchopra/repo_projects/dms-snowpipe-dbt-airflow
+export AWS_PROFILE=default
+export AWS_REGION=us-east-1
+SM_ARN=$(cd infra/aws && terraform output -raw step_function_arn)
+
+python scripts/patchit/aws_failure_watcher.py   --state-machine-arn "$SM_ARN"   --repo-key aws_dms   --patchit-ingest-url http://127.0.0.1:18088/events/ingest   --poll-interval 60
+```
+
+To run once and exit:
+
+```bash
+python scripts/patchit/aws_failure_watcher.py   --state-machine-arn "$SM_ARN"   --repo-key aws_dms   --patchit-ingest-url http://127.0.0.1:18088/events/ingest   --once
+```
+
 
 Use this to verify PATCHIT can catch AWS failures and propose a fix against this repo.
 
@@ -309,3 +331,132 @@ python scripts/patchit/ingest_aws_failures_to_patchit.py \
 
 For Snowflake, ingest a failed task/query event to PATCHIT with `platform=snowflake` and `repo_key=snow`.
 If you already run the PATCHIT Snowflake lab, continue using that ingest flow, then compare PR quality across AWS and Snowflake incidents.
+
+## Snowflake Cost Copilot Builder Prototype
+
+This repo now includes a working prototype under:
+
+- `sql/01_bootstrap.sql`
+- `sql/02_views.sql`
+- `sql/03_rules.sql`
+- `python/collector.py`
+- `python/rules.py`
+- `python/ai_recommender.py`
+- `python/executor.py`
+- `python/run_copilot.py`
+- `python/chat_api.py`
+- `ui/app.py`
+
+### 1) Environment Variables
+
+Set these before running:
+
+```bash
+export SNOWFLAKE_ACCOUNT=...
+export SNOWFLAKE_USER=...
+export SNOWFLAKE_PASSWORD=...            # or key-pair auth adaptation
+export SNOWFLAKE_ROLE=...
+export SNOWFLAKE_WAREHOUSE=...
+export SNOWFLAKE_DATABASE=...            # e.g. ANALYTICS
+export SNOWFLAKE_SCHEMA=COST_COPILOT
+
+# Optional AI
+export LLM_API_KEY=...                   # if omitted, template mode is used
+export LLM_MODEL=gpt-4o-mini
+```
+
+Install runtime dependencies:
+
+```bash
+pip install snowflake-connector-python fastapi uvicorn streamlit
+```
+
+### 2) Bootstrap Schema and Objects
+
+Run in Snowflake (Snowsql, Worksheets, or SQL runner):
+
+```sql
+USE ROLE <role_with_create_privileges>;
+USE DATABASE <your_database>;
+CREATE SCHEMA IF NOT EXISTS COST_COPILOT;
+-- run file:
+-- sql/01_bootstrap.sql
+-- then:
+-- sql/02_views.sql
+```
+
+### 3) Run Copilot (Collector -> Rules -> AI -> Executor)
+
+```bash
+cd /Users/ankurchopra/repo_projects/dms-snowpipe-dbt-airflow
+python python/run_copilot.py --days 7 --mode DRY_RUN --ai on
+```
+
+Console output includes:
+
+- Top 10 heavy query tags (credits + elapsed + scanned GB)
+- Top 10 rules recommendations
+- Top 10 AI recommendations
+- 2 SQL snippets for investigation
+
+### 4) Validate Outputs
+
+Run these checks:
+
+```sql
+SELECT * FROM COST_COPILOT.RECOMMENDATIONS ORDER BY created_at DESC LIMIT 50;
+SELECT * FROM COST_COPILOT.AI_RECOMMENDATIONS ORDER BY created_at DESC LIMIT 50;
+SELECT * FROM COST_COPILOT.V_HEAVY_TAGS_7D ORDER BY credits_total DESC LIMIT 20;
+```
+
+Verify top offenders align with `SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY` and `QUERY_ATTRIBUTION_HISTORY`.
+
+### 5) Start Chat API + UI
+
+Terminal 1:
+
+```bash
+cd /Users/ankurchopra/repo_projects/dms-snowpipe-dbt-airflow
+uvicorn python.chat_api:app --reload --port 8000
+```
+
+Terminal 2:
+
+```bash
+cd /Users/ankurchopra/repo_projects/dms-snowpipe-dbt-airflow
+streamlit run ui/app.py
+```
+
+Example questions:
+
+- `Top 5 expensive query tags last 7 days`
+- `Which jobs spilled to remote storage yesterday?`
+- `Which warehouses have idle burn?`
+- `Why is OPS.FLIGHT_EVENTS expensive?`
+
+### 6) APPLY Safety Test (Dev Only)
+
+1. Approve one LOW-risk recommendation:
+
+```sql
+INSERT INTO COST_COPILOT.APPROVALS (rec_id, approved, approved_by, approved_at, approval_note)
+SELECT rec_id, TRUE, CURRENT_USER(), CURRENT_TIMESTAMP(), 'dev apply test'
+FROM COST_COPILOT.RECOMMENDATIONS
+WHERE risk = 'LOW'
+  AND ddl_sql IS NOT NULL
+  AND ddl_sql <> ''
+ORDER BY created_at DESC
+LIMIT 1;
+```
+
+2. Run APPLY mode:
+
+```bash
+python python/run_copilot.py --days 7 --mode APPLY --ai on
+```
+
+3. Verify action logging and rollback capture:
+
+```sql
+SELECT * FROM COST_COPILOT.ACTION_LOG ORDER BY created_at DESC LIMIT 20;
+```

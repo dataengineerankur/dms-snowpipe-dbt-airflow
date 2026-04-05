@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Snowflake University Visual Guide</title>
+<style>
+:root{--bg:#06101c;--panel:rgba(8,18,36,.82);--line:rgba(145,185,255,.16);--text:#f4f8ff;--muted:#9fb0ce;--cyan:#4ccfff;--blue:#7390ff;--pink:#ff7fc9;--gold:#ffcb57;--green:#53e2a0;--shadow:0 24px 70px rgba(0,0,0,.35);--r:22px}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--text);font-family:Arial,Helvetica,sans-serif;background:radial-gradient(circle at 18% 10%,rgba(76,207,255,.14),transparent 18%),radial-gradient(circle at 82% 12%,rgba(255,127,201,.13),transparent 18%),linear-gradient(180deg,#06101c,#020711)}body:before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(120,150,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(120,150,255,.05) 1px,transparent 1px);background-size:42px 42px;mask-image:radial-gradient(circle at center,black 35%,transparent 88%);pointer-events:none}.app{display:grid;grid-template-columns:300px 1fr;min-height:100vh}.side{position:sticky;top:0;height:100vh;padding:18px;border-right:1px solid var(--line);background:linear-gradient(180deg,rgba(4,8,18,.94),rgba(4,8,18,.78));overflow:auto}.brand,.section,.card,pre{border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));box-shadow:var(--shadow)}.brand{padding:16px;margin-bottom:12px}.eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);margin-bottom:8px}.brand h1{margin:0 0 8px;font-size:24px;line-height:1.02}.muted{color:var(--muted);line-height:1.55}.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}.stat{padding:12px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)}.stat strong{display:block;font-size:18px}.stat span{font-size:12px;color:var(--muted)}.nav a,.quick a{display:block;padding:10px 12px;margin:6px 0;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:var(--text);text-decoration:none;font-size:13px}.nav a:hover,.quick a:hover{background:rgba(76,207,255,.1);border-color:rgba(76,207,255,.3)}.group{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#7790ba;margin:12px 0 4px}.main{padding:18px 18px 40px}.hero{padding:24px;border:1px solid var(--line);border-radius:30px;background:linear-gradient(135deg,rgba(17,35,68,.92),rgba(8,15,31,.92));box-shadow:var(--shadow);position:relative;overflow:hidden}.hero:after{content:"";position:absolute;right:-80px;top:-80px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(115,144,255,.35),transparent 65%)}.hero h2{margin:6px 0 12px;font-size:clamp(34px,5vw,72px);line-height:.92;max-width:12ch;letter-spacing:-.04em}.chips,.pills{display:flex;flex-wrap:wrap;gap:8px}.chip,.pill{padding:8px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);font-size:12px;color:var(--muted)}.section{padding:18px;margin-top:16px;animation:fade .5s ease both}.section h3{margin:0 0 8px;font-size:30px}.split{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:12px}.card{padding:12px;border-radius:18px;background:rgba(255,255,255,.03)}.card .t{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#86a0cb;margin-bottom:6px}.card .b{font-size:13px;line-height:1.55}.code-title{margin:0 0 8px;font-size:16px}pre{margin:0;padding:14px;overflow:auto;white-space:pre-wrap;word-break:break-word;font:12px/1.55 "Courier New",monospace;color:#cde5ff;background:rgba(3,8,16,.94)}.mini{font-size:12px;color:var(--muted)}@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}@media(max-width:1100px){.app{grid-template-columns:1fr}.side{position:relative;height:auto;border-right:0;border-bottom:1px solid var(--line)}.split{grid-template-columns:1fr}}
+details.deep{margin-top:12px;border:1px solid rgba(145,185,255,.2);border-radius:16px;padding:12px 14px;background:rgba(3,8,16,.55)}details.deep summary{cursor:pointer;font-weight:bold;color:#cfe7ff;margin-bottom:8px}details.deep .inner{color:#9fb0ce;font-size:13px;line-height:1.65;margin-top:6px}details.deep strong{color:#f4f8ff}.refbox{margin-top:14px;padding:14px;border-radius:18px;border:1px dashed rgba(76,207,255,.35);background:rgba(76,207,255,.06)}.refbox a{color:#4ccfff}.arch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:12px;margin-top:14px}.arch-card{padding:14px;border-radius:18px;border:1px solid rgba(145,185,255,.22);background:rgba(3,8,16,.5)}.arch-card h4{margin:0 0 6px;font-size:15px;color:#f4f8ff}.arch-card p{margin:0 0 10px;font-size:12px;line-height:1.5;color:var(--muted)}.arch-actions{display:flex;flex-wrap:wrap;gap:8px}.arch-actions a{display:inline-block;padding:7px 12px;border-radius:999px;font-size:12px;text-decoration:none;font-weight:600;border:1px solid rgba(76,207,255,.4);color:#4ccfff;background:rgba(76,207,255,.1)}.arch-actions a.run{border-color:rgba(255,203,87,.45);color:#ffcb57;background:rgba(255,203,87,.1)}.arch-actions a:hover{filter:brightness(1.15)}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+<div class="brand">
+<div class="eyebrow">Snowflake University Live Lab</div>
+<h1>Learn it while the repo sits beside you.</h1>
+<div class="muted">An animated visual walkthrough of the pipelines, objects, commands, and validation steps already built in this repo.</div>
+</div>
+<div class="stats"><div class="stat"><strong>50.1M</strong><span>raw orders</span></div><div class="stat"><strong>100M</strong><span>raw events</span></div><div class="stat"><strong>4</strong><span>major pipelines</span></div><div class="stat"><strong>15+</strong><span>concepts covered</span></div></div>
+<div class="quick"><a href="http://localhost:8080" target="_blank" rel="noreferrer">Open Airflow</a><a href="http://localhost:8502" target="_blank" rel="noreferrer">Open Retail UI</a><a href="http://localhost:8081" target="_blank" rel="noreferrer">Open Kafka Console</a></div>
+<div class="nav">
+<div class="group">Project Pipelines</div>
+<a href="#overview">Overview</a>
+<a href="#architecture">Architecture map</a>
+<a href="#dms">DMS / Snowpipe / dbt</a>
+<a href="#retail">Retail Realtime</a>
+<div class="group">Snowflake University</div>
+<a href="#foundation">Foundation Dataset</a>
+<a href="#transient">Transient Tables</a>
+<a href="#streams">Streams CDC</a>
+<a href="#tasks">Tasks and Airflow</a>
+<a href="#managed">Dynamic Tables and MVs</a>
+<a href="#snowpark">Snowpark and Snapshots</a>
+<a href="#internals">Clustering and Internals</a>
+<a href="#external">External Tables</a>
+<div class="group">Practice Mode</div>
+<a href="#deepdive">Senior deep dive</a>
+<a href="#iceberg">Iceberg on S3</a>
+<a href="#runorder">Run Order</a>
+</div>
+</aside>
+<main class="main">
+<section class="hero" id="overview">
+<div class="eyebrow">Start here</div>
+<h2>Four pipelines, one learning surface.</h2>
+<div class="muted">This repo now behaves like a working data-engineering university: classic DMS to Snowflake analytics, a live retail event pipeline, Databricks-style lakehouse work, and a deep Snowflake concept lab.</div>
+<div class="chips" style="margin-top:12px"><div class="chip">run exact scripts</div><div class="chip">watch exact objects change</div><div class="chip">inspect Query Profile</div><div class="chip">learn side by side</div></div>
+</section>
+
+<section class="section" id="architecture">
+<div class="eyebrow">Interactive</div>
+<h3>Architecture map — jump to deep dive or runbook</h3>
+<div class="muted">Each component has two links: <strong style="color:#4ccfff">Deep dive</strong> opens the narrative HTML (why, cost, backend). <strong style="color:#ffcb57">Runbook</strong> opens the step-by-step HTML at the matching section.</div>
+<div class="arch-grid">
+<div class="arch-card"><h4>DMS / Snowpipe / dbt</h4><p>Postgres → S3 → pipe → RAW → dbt → GOLD.</p><div class="arch-actions"><a href="snowflake_university_deep_dive.html#dd-dms">Deep dive</a><a class="run" href="snowflake_university_runbook.html#snowpipe-dms">Runbook</a></div></div>
+<div class="arch-card"><h4>Retail realtime</h4><p>Kafka, Spark, S3 raw/bronze, Airflow.</p><div class="arch-actions"><a href="snowflake_university_deep_dive.html#dd-retail">Deep dive</a><a class="run" href="snowflake_university_runbook.html#retail-stack">Runbook</a></div></div>
+<div class="arch-card"><h4>Foundation dataset</h4><p>Scale that makes pruning and maintenance real.</p><div class="arch-actions"><a href="snowflake_university_deep_dive.html#dd-foundation">Deep dive</a><a class="run" href="snowflake_university_runbook.html#step-01">Runbook</a></div></div>
+<div class="arch-card"><h4>Transient tables</h4><p>Staging economics and clone semantics.</p><div class="arch-actions"><a href="snowflake_university_deep_dive.html#dd-transient">Deep dive</a><a class="run" href="snowflake_university_runbook.html#step-02">Runbook</a></div></div>
+<div class="arch-card"><h4>Streams (CDC)</h4><p>Offsets, consume, audit/silver.</p><div class="arch-actions"><a href="snowflake_university_deep_dive.html#dd-streams">Deep dive</a><a class="run" href="snowflake_university_runbook.html#step-03">Runbook</a></div></div>
+<div class="arch-card"><h4>Tasks</h4><p>In-Snowflake task graph.</p><div class="arch-actions"><a href="snowflake_university_deep_dive.html#dd-tasks">Deep dive</a><a class="run" href="snowflake_university_runbook.html#step-06">Runbook</a></div></div>
+<div class="arch-card"><h4>Dynamic tables</h4><p>Managed refresh and lag.</p><div class="arch-actions"><a href="snowflake_university_deep_dive.html#dd-dynamic">Deep dive</a><a class="run" href="snowflake_university_runbook.html#step-08">Runbook</a></div></div>
+<div class="arch-card"><h4>Materialized views</h4><p>Precomputed hot paths.</p><div class="arch-actions"><a href="snowflake_university_deep_dive.html#dd-mv">Deep dive</a><a class="run" href="snowflake_university_runbook.html#step-09">Runbook</a></div></div>
+<div class="arch-card"><h4>Snowpark</h4><p>Python pushdown in Snowflake.</p><div class="arch-actions"><a href="snowflake_university_deep_dive.html#dd-snowpark">Deep dive</a><a class="run" href="snowflake_university_runbook.html#step-10">Runbook</a></div></div>
+<div class="arch-card"><h4>dbt snapshots</h4><p>SCD2 history.</p><div class="arch-actions"><a href="snowflake_university_deep_dive.html#dd-snapshots">Deep dive</a><a class="run" href="snowflake_university_runbook.html#step-11">Runbook</a></div></div>
+<div class="arch-card"><h4>Clustering benchmark</h4><p>Pruning vs layout.</p><div class="arch-actions"><a href="snowflake_university_deep_dive.html#dd-clustering">Deep dive</a><a class="run" href="snowflake_university_runbook.html#step-15">Runbook</a></div></div>
+<div class="arch-card"><h4>Internals lab</h4><p>Clones, cache, monitors.</p><div class="arch-actions"><a href="snowflake_university_deep_dive.html#dd-internals">Deep dive</a><a class="run" href="snowflake_university_runbook.html#step-16">Runbook</a></div></div>
+<div class="arch-card"><h4>External tables</h4><p>Lake files in place.</p><div class="arch-actions"><a href="snowflake_university_deep_dive.html#dd-external">Deep dive</a><a class="run" href="snowflake_university_runbook.html#step-17">Runbook</a></div></div>
+<div class="arch-card"><h4>Iceberg on S3</h4><p>Managed Iceberg starter.</p><div class="arch-actions"><a href="snowflake_university_deep_dive.html#dd-iceberg">Deep dive</a><a class="run" href="snowflake_university_runbook.html#step-18">Runbook</a></div></div>
+<div class="arch-card"><h4>Airflow DAGs</h4><p>Cross-system orchestration.</p><div class="arch-actions"><a href="snowflake_university_deep_dive.html#dd-airflow">Deep dive</a><a class="run" href="snowflake_university_runbook.html#airflow-path">Runbook</a></div></div>
+</div>
+</section>
+
+<section class="section" id="deepdive">
+<div class="eyebrow">In depth</div>
+<h3>Senior-level narrative: why each feature exists, cost levers, and backend behavior</h3>
+<div class="muted">The sections below stay scannable. For the full prose (including the patterns table and extended notes), keep the Markdown handy—or use the interactive deep dive page with sidebar navigation.</div>
+<div class="refbox"><strong>Open:</strong> <a href="snowflake_university_deep_dive.html">snowflake_university_deep_dive.html</a> · <a href="snowflake_university_runbook.html">snowflake_university_runbook.html</a> · <code>snowflake_university_deep_dive.md</code></div>
+</section>
+
+<section class="section" id="dms"><div class="split"><div><div class="eyebrow">Pipeline 1</div><h3>Postgres to Snowflake analytics spine</h3><div class="muted">Source tables land in S3 through DMS, Snowpipe ingests into RAW, dbt reshapes into analytics models, and Airflow orchestrates runs.</div><details class="deep"><summary>Why this pipeline pattern</summary><div class="inner">Separation of replication (DMS), durable landing (S3), governed ingest (Snowpipe), semantic modeling (dbt), and orchestration (Airflow) mirrors how enterprises reduce blast radius and assign ownership.</div></details><details class="deep"><summary>Cost levers</summary><div class="inner">Right-size warehouses, avoid tiny parquet files in S3, monitor pipe history for failures and replays, and keep RAW thin so you do not pay storage for derived logic.</div></details><div class="grid"><div class="card"><div class="t">Flow</div><div class="b">Postgres -> DMS -> S3 -> Snowpipe -> RAW -> dbt -> GOLD -> Airflow</div></div><div class="card"><div class="t">What to observe</div><div class="b">S3 object arrival, pipe history, dbt graph, Airflow DAG runs.</div></div><div class="card"><div class="t">What to understand</div><div class="b">Landing raw data is different from modeling business data.</div></div></div></div><div><div class="code-title">Run and verify</div><pre>cd dbt
+DBT_PROFILES_DIR=. ../.venv-snowflake/bin/dbt run --select gold
+DBT_PROFILES_DIR=. ../.venv-snowflake/bin/dbt test --select gold
+
+SELECT * FROM RAW_DB.PUBLIC.RAW_ORDERS LIMIT 20;
+SELECT * FROM ANALYTICS.GOLD.ORDERS_DAILY_AGG LIMIT 20;</pre></div></div></section>
+<section class="section" id="retail"><div class="split"><div><div class="eyebrow">Pipeline 2</div><h3>Retail realtime pipeline</h3><div class="muted">A checkout in the Streamlit app becomes a Kafka event, Spark Structured Streaming lands raw JSON in S3, and Airflow promotes raw objects into bronze.</div><details class="deep"><summary>Why Kafka + Spark here</summary><div class="inner">Decouples the UI from analytics consumers, absorbs traffic spikes, and lands immutable raw events before bronze normalization—classic event-driven ELT.</div></details><details class="deep"><summary>Cost levers</summary><div class="inner">Batch bronze promotion (Airflow schedule), monitor Spark executor sizing, and compact raw JSON sprawl if object counts explode.</div></details><div class="grid"><div class="card"><div class="t">Flow</div><div class="b">UI -> FastAPI -> Kafka -> Spark Streaming -> S3 raw -> Airflow bronze</div></div><div class="card"><div class="t">Where to look</div><div class="b">Retail UI, Kafka Console, Spark status, Airflow DAG, S3 raw and bronze prefixes.</div></div><div class="card"><div class="t">Best live demo</div><div class="b">Submit one transaction and trace it through each layer.</div></div></div></div><div><div class="code-title">Run and verify</div><pre>./scripts/start_retail_stack.sh
+open "http://localhost:8502"
+open "http://localhost:8081"
+open "http://localhost:8080"
+
+Raw:    s3://dms-snowpipe-dev-05d6e64a/retail-live/raw/transactions/
+Bronze: s3://dms-snowpipe-dev-05d6e64a/retail-live/bronze/transactions/</pre></div></div></section>
+<section class="section" id="foundation"><div class="split"><div><div class="eyebrow">Concept 1</div><h3>Foundation dataset</h3><div class="muted">The whole university matters because the data is large enough to expose query planning, scan behavior, refresh maintenance, and history patterns.</div><details class="deep"><summary>Lead read: why scale matters</summary><div class="inner">Micro-partition pruning, MV maintenance, and stream volume only show real tradeoffs at millions of rows. This script generates reproducible facts so Query Profile and storage metrics are trustworthy.</div></details><details class="deep"><summary>Cost levers</summary><div class="inner">Lower row targets in the script for dev, use a smaller warehouse for iteration, drop benchmark clones when finished.</div></details><div class="grid"><div class="card"><div class="t">Tables</div><div class="b">RAW_ORDERS, RAW_EVENTS, RAW_PRODUCTS, RAW_CUSTOMERS</div></div><div class="card"><div class="t">Scale</div><div class="b">50.1M orders, 100M events, 200K products, 500K customers</div></div><div class="card"><div class="t">Lesson</div><div class="b">Features only become educational when the workload is large enough to show tradeoffs.</div></div></div></div><div><div class="code-title">Run and verify</div><pre>scripts/00_create_foundation_dataset.sql
+
+SELECT 'raw_orders', COUNT(*) FROM RAW_DB.PUBLIC.RAW_ORDERS
+UNION ALL
+SELECT 'raw_events', COUNT(*) FROM RAW_DB.PUBLIC.RAW_EVENTS
+UNION ALL
+SELECT 'raw_products', COUNT(*) FROM RAW_DB.PUBLIC.RAW_PRODUCTS
+UNION ALL
+SELECT 'raw_customers', COUNT(*) FROM RAW_DB.PUBLIC.RAW_CUSTOMERS;</pre><div class="mini">Current behavior: this script is hard-coded to full scale. If you want a smaller dev run, edit its SET statements first.</div></div></div></section>
+<section class="section" id="transient"><div class="split"><div><div class="eyebrow">Concept 2</div><h3>Transient tables</h3><div class="muted">Cheap staging with sharp edges. This demo shows both the good pattern and the anti-pattern.</div><details class="deep"><summary>Backend note</summary><div class="inner">Transient tables still use micro-partitions but trade some durability and clone semantics for lower storage overhead—ideal for staging, risky for systems of record.</div></details><details class="deep"><summary>Cost levers</summary><div class="inner">Promote only validated data to permanent tables; drop transient scratch objects aggressively.</div></details><div class="grid"><div class="card"><div class="t">Created</div><div class="b">Transient staging clone plus permanent promoted copy.</div></div><div class="card"><div class="t">Observe</div><div class="b">Storage metrics, clone behavior, and the expected failure path.</div></div><div class="card"><div class="t">Understand</div><div class="b">Transient is great for staging, not a blanket replacement for permanent tables.</div></div></div></div><div><div class="code-title">Run and verify</div><pre>scripts/01_transient_tables.sql
+
+SHOW TABLES LIKE 'STG_ORDERS%' IN SCHEMA STAGING_DB.PUBLIC;
+SHOW TABLES LIKE 'STG_ORDERS%' IN SCHEMA SILVER_DB.PUBLIC;
+SELECT * FROM INFORMATION_SCHEMA.TABLE_STORAGE_METRICS
+WHERE TABLE_NAME IN ('STG_ORDERS_TRANSIENT','STG_ORDERS_PERMANENT');</pre></div></div></section>
+<section class="section" id="streams"><div class="split"><div><div class="eyebrow">Concept 3</div><h3>Streams CDC</h3><div class="muted">Streams teach you that CDC is an offset problem, not just a MERGE problem. The repo separates setup, change generation, and deterministic consumption.</div><details class="deep"><summary>Backend note</summary><div class="inner">Streams are offsets into table versions, not a message broker. Consumption advances only after successful DML, which is why single-consumer designs are safer.</div></details><details class="deep"><summary>Cost levers</summary><div class="inner">Narrow MERGE predicates, consume on a steady schedule, and avoid multiple writers racing the same stream.</div></details><div class="grid"><div class="card"><div class="t">Objects</div><div class="b">ORDERS_CDC_STREAM, ORDERS_AUDIT, ORDERS_SILVER</div></div><div class="card"><div class="t">Observe</div><div class="b">Backlog before consume, offset advance after consume, audit growth, and silver convergence.</div></div><div class="card"><div class="t">Understand</div><div class="b">Single-consumer design matters. Audit-first CDC is easier to reason about.</div></div></div></div><div><div class="code-title">Run and verify</div><pre>scripts/02_streams.sql
+scripts/02_streams_trigger_changes.sql
+scripts/02_streams_consume.sql
+
+SELECT SYSTEM$STREAM_HAS_DATA('RAW_DB.PUBLIC.ORDERS_CDC_STREAM');
+SELECT COUNT(*) FROM AUDIT_DB.PUBLIC.ORDERS_AUDIT;
+SELECT COUNT(*) FROM SILVER_DB.PUBLIC.ORDERS_SILVER;</pre></div></div></section>
+<section class="section" id="tasks"><div class="split"><div><div class="eyebrow">Concepts 4 and 11</div><h3>Snowflake tasks and Airflow</h3><div class="muted">The task graph shows in-warehouse orchestration. Airflow acts as the outer control plane for repeatable runs and visual learning.</div><details class="deep"><summary>When to pick Tasks vs Airflow</summary><div class="inner">Tasks excel when all steps are SQL inside Snowflake. Airflow wins for cross-system DAGs (this repo uses both on purpose).</div></details><details class="deep"><summary>Cost levers</summary><div class="inner">Suspend idle graphs, avoid scanning entire facts when only deltas exist—pair with streams or incremental patterns.</div></details><div class="grid"><div class="card"><div class="t">Task graph</div><div class="b">ROOT_TASK_INGEST -> staged CDC -> silver -> deletes -> gold -> run log</div></div><div class="card"><div class="t">Airflow lesson</div><div class="b">Use Airflow when you want cross-system orchestration or easier replay and visualization.</div></div><div class="card"><div class="t">Understand</div><div class="b">Only one task should consume the stream directly.</div></div></div></div><div><div class="code-title">Run and verify</div><pre>scripts/03_tasks.sql
+EXECUTE TASK AUDIT_DB.PUBLIC.ROOT_TASK_INGEST;
+
+SHOW TASKS IN SCHEMA AUDIT_DB.PUBLIC;
+SELECT * FROM AUDIT_DB.PUBLIC.PIPELINE_RUNS ORDER BY RUN_TS DESC LIMIT 20;
+SELECT * FROM GOLD_DB.PUBLIC.ORDERS_DAILY_AGG LIMIT 20;</pre></div></div></section>
+<section class="section" id="managed"><div class="split"><div><div class="eyebrow">Concepts 5 and 6</div><h3>Dynamic tables and materialized views</h3><div class="muted">These are convenience layers with maintenance tradeoffs. They reduce manual work, but only if your SQL and access patterns align with how Snowflake maintains them.</div><details class="deep"><summary>Dynamic tables vs MVs</summary><div class="inner">Dynamic tables optimize for layered pipelines with lag contracts; MVs optimize for read-heavy aggregates and filtered access paths. Both charge maintenance and storage.</div></details><details class="deep"><summary>Cost levers</summary><div class="inner">Watch refresh mode reasons, avoid non-deterministic SQL that forces full refresh, and drop unused MVs.</div></details><div class="grid"><div class="card"><div class="t">Dynamic tables</div><div class="b">Bronze, silver, and gold managed refresh chain.</div></div><div class="card"><div class="t">Materialized views</div><div class="b">Aggregate, filter-heavy, recent-order, and secure MV patterns.</div></div><div class="card"><div class="t">Understand</div><div class="b">Managed does not mean free; refresh mode and maintenance cost still matter.</div></div></div></div><div><div class="code-title">Run and verify</div><pre>scripts/04_dynamic_tables.sql
+scripts/05_materialized_views.sql
+
+SHOW DYNAMIC TABLES IN ACCOUNT;
+SHOW MATERIALIZED VIEWS IN SCHEMA GOLD_DB.PUBLIC;</pre></div></div></section>
+<section class="section" id="snowpark"><div class="split"><div><div class="eyebrow">Concepts 7 and 8</div><h3>Snowpark and dbt snapshots</h3><div class="muted">Snowpark teaches pushdown and lazy execution. Snapshots teach durable history when source tables keep changing.</div><details class="deep"><summary>Why Snowpark</summary><div class="inner">Keeps governance and data residency inside Snowflake while giving engineers Python ergonomics; execution still runs as Snowflake queries under the hood.</div></details><details class="deep"><summary>Cost levers</summary><div class="inner">Always read execution plans, avoid shipping huge intermediates to the client, and size warehouses for write-heavy stages.</div></details><div class="grid"><div class="card"><div class="t">Snowpark outputs</div><div class="b">SP_ORDERS_ENRICHED, SP_ORDER_VALUE_SEGMENTS, SCORED_ORDERS, SP_REGION_FEATURES</div></div><div class="card"><div class="t">Snapshot lesson</div><div class="b">dbt_valid_from and dbt_valid_to make change history explicit.</div></div><div class="card"><div class="t">Understand</div><div class="b">Snowpark is a Snowflake execution client, not local pandas. Snapshots preserve truth over time.</div></div></div></div><div><div class="code-title">Run and verify</div><pre>PYTHONPATH=$(pwd) .venv-snowflake/bin/python snowpark/snowpark_pipelines.py
+cd dbt
+DBT_PROFILES_DIR=. ../.venv-snowflake/bin/dbt snapshot --select snp_products snp_customers snp_orders_status
+# run scripts/08_trigger_snapshot_changes.sql
+DBT_PROFILES_DIR=. ../.venv-snowflake/bin/dbt snapshot --select snp_products snp_customers snp_orders_status
+DBT_PROFILES_DIR=. ../.venv-snowflake/bin/dbt run --select university+ orders_with_status_history</pre></div></div></section>
+<section class="section" id="internals"><div class="split"><div><div class="eyebrow">Concepts 9 and 10</div><h3>Clustering and internals</h3><div class="muted">This is where Snowflake stops feeling magical and starts feeling physical: layout, pruning, clones, cache behavior, and resource monitors.</div><details class="deep"><summary>Clones and cache</summary><div class="inner">Zero-copy clones share immutable files until divergence—fast for dev/test. Result cache can mask true performance; disable when benchmarking honestly.</div></details><details class="deep"><summary>Cost levers</summary><div class="inner">Resource monitors cap spend; clustering only where predicates justify it.</div></details><div class="grid"><div class="card"><div class="t">Benchmark</div><div class="b">Five physical copies of the orders table with different clustering strategies.</div></div><div class="card"><div class="t">Internals pack</div><div class="b">Clone database, clone table, cache comparisons, and resource monitor setup.</div></div><div class="card"><div class="t">Understand</div><div class="b">Cluster for predicates, not for aesthetics. Always note cache state when measuring.</div></div></div></div><div><div class="code-title">Run and verify</div><pre>scripts/09_clustering_benchmark.sql
+scripts/10_internals_deep_dive.sql
+
+SELECT COUNT(*) FROM BENCHMARKS.PUBLIC.RAW_ORDERS_NO_CLUSTER;
+SELECT COUNT(*) FROM BENCHMARKS.PUBLIC.CLUSTERING_RESULTS;
+SHOW DATABASES LIKE 'RAW_DB_DEV';
+SHOW RESOURCE MONITORS;</pre></div></div></section>
+<section class="section" id="external"><div class="split"><div><div class="eyebrow">Lake pattern</div><h3>External stages and external tables</h3><div class="muted">Query Parquet in S3 without loading bytes into native Snowflake storage first. Snowflake keeps file metadata and partition expressions; compute decodes files at query time.</div><details class="deep"><summary>Why Snowflake built this</summary><div class="inner">Enterprises already land curated data in object storage. External tables let SQL consumers access those files with IAM-governed paths, partition pruning, and optional auto-refresh—without forcing an immediate full COPY.</div></details><details class="deep"><summary>Backend engineering (conceptual)</summary><div class="inner"><strong>Stage</strong> binds a URL + storage integration to credentials. <strong>External table</strong> registers files and partition columns (often path-derived). Queries compile into scans over matching objects; Parquet is read and projected using column expressions like <code>$1:col</code>. <strong>REFRESH</strong> updates metadata when AUTO_REFRESH is off or events are not wired.</div></details><details class="deep"><summary>Benefits vs native tables</summary><div class="inner"><strong>Pros:</strong> no duplicate storage, fast time-to-query on lake files, clear separation of lake vs warehouse roles. <strong>Cons:</strong> higher per-query decode cost vs well-clustered native tables; freshness depends on refresh strategy; wide scans hurt credits.</div></details><details class="deep"><summary>Cost optimization</summary><div class="inner">Align partitions with filters (e.g., <code>load_dt=</code> paths), avoid <code>SELECT *</code>, compare Query Profile to Snowpipe-loaded <code>ANALYTICS.RAW.ORDERS</code> for hot paths, and promote heavy dashboards to native or MV/dynamic tables.</div></details><div class="grid"><div class="card"><div class="t">Repo script</div><div class="b">scripts/12_external_tables_and_lake_patterns.sql</div></div><div class="card"><div class="t">Terraform hint</div><div class="b">Storage integration S3_DMS_INT, prefix dms/ (infra/snowflake/main.tf)</div></div><div class="card"><div class="t">Objects created</div><div class="b">EXT_DEMO.PUBLIC.DMS_ORDERS_EXT, EXT_DMS_ORDERS</div></div></div></div><div><div class="code-title">Run and verify</div><pre>scripts/12_external_tables_and_lake_patterns.sql
+
+LIST @EXT_DEMO.PUBLIC.DMS_ORDERS_EXT LIMIT 20;
+SHOW EXTERNAL TABLES IN SCHEMA EXT_DEMO.PUBLIC;
+SELECT COUNT(*) FROM EXT_DEMO.PUBLIC.EXT_DMS_ORDERS;</pre><div class="mini">If CREATE STAGE fails, run SHOW STORAGE INTEGRATIONS; and align the name + bucket with your account.</div></div></div></section>
+
+<section class="section" id="iceberg"><div class="split"><div><div class="eyebrow">Concept add-on</div><h3>Iceberg on S3</h3><div class="muted">Use this lab to compare native Snowflake tables with Snowflake-managed Iceberg tables whose files live on S3. If you later want true multi-engine discovery, add the right external catalog or open catalog setup on top.</div><details class="deep"><summary>Iceberg vs external table vs native</summary><div class="inner"><strong>Native</strong> table: best query ergonomics inside Snowflake. <strong>External table</strong>: query files in place. <strong>Iceberg</strong>: open table format with snapshot semantics—often paired with external catalogs for multi-engine sharing beyond this starter.</div></details><details class="deep"><summary>Cost levers</summary><div class="inner">External volume IAM trust must be correct; compact small files upstream; use deterministic load slices for reproducible labs.</div></details><div class="grid"><div class="card"><div class="t">What it is</div><div class="b">A Snowflake-managed Iceberg starter on your existing S3 bucket.</div></div><div class="card"><div class="t">What it is not</div><div class="b">Not a full cross-engine discovery setup by itself yet.</div></div><div class="card"><div class="t">Understand</div><div class="b">This is about open storage patterns and lakehouse direction, not replacing every native Snowflake table.</div></div></div></div><div><div class="code-title">Run and verify</div><pre>docs/snowflake_iceberg_lab.md
+scripts/11_iceberg_s3_lab.sql
+
+CREATE OR REPLACE EXTERNAL VOLUME UNIVERSITY_ICEBERG_VOL
+  STORAGE_LOCATIONS = ((
+    NAME = 'primary'
+    STORAGE_PROVIDER = 'S3'
+    STORAGE_BASE_URL = 's3://dms-snowpipe-dev-05d6e64a/snowflake-university/iceberg/'
+    STORAGE_AWS_ROLE_ARN = '<YOUR_AWS_ROLE_ARN>'
+  ));</pre></div></div></section>
+<section class="section" id="runorder"><div class="eyebrow">Practice mode</div><h3>Best run order</h3><div class="muted">Move from physical data, to CDC, to orchestration, to managed abstractions, to programmable compute, to historical truth, to physical optimization, then to Iceberg.</div><pre>1. scripts/00_create_foundation_dataset.sql
+2. scripts/01_transient_tables.sql
+3. scripts/02_streams.sql
+4. scripts/02_streams_trigger_changes.sql
+5. scripts/02_streams_consume.sql
+6. scripts/03_tasks.sql
+7. scripts/04_dynamic_tables.sql
+8. scripts/05_materialized_views.sql
+9. PYTHONPATH=$(pwd) .venv-snowflake/bin/python snowpark/snowpark_pipelines.py
+10. cd dbt && DBT_PROFILES_DIR=. ../.venv-snowflake/bin/dbt snapshot --select snp_products snp_customers snp_orders_status
+11. scripts/08_trigger_snapshot_changes.sql
+12. cd dbt && DBT_PROFILES_DIR=. ../.venv-snowflake/bin/dbt snapshot --select snp_products snp_customers snp_orders_status
+13. cd dbt && DBT_PROFILES_DIR=. ../.venv-snowflake/bin/dbt run --select university+ orders_with_status_history
+14. scripts/09_clustering_benchmark.sql
+15. scripts/10_internals_deep_dive.sql
+16. scripts/12_external_tables_and_lake_patterns.sql
+17. scripts/11_iceberg_s3_lab.sql</pre></section>
+</main>
+</div>
+</body>
+</html>

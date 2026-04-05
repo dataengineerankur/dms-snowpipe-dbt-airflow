@@ -1,0 +1,65 @@
+digraph snowflake_pipeline {
+  graph [
+    label="Pipeline 3: Postgres to Snowflake with Snowpipe and dbt",
+    labelloc=t,
+    labeljust=l,
+    fontsize=24,
+    fontname="Helvetica-Bold",
+    bgcolor="#0f172a",
+    rankdir=LR,
+    nodesep=0.55,
+    ranksep=0.9,
+    pad=0.35,
+    splines=polyline
+  ];
+
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, color="#1e293b", penwidth=1.2, margin="0.18,0.12"];
+  edge [color="#93c5fd", penwidth=1.8, arrowsize=0.8, fontname="Helvetica", fontsize=10, fontcolor="#e2e8f0"];
+
+  subgraph cluster_source {
+    label="Operational Source";
+    color="#334155"; style="rounded,filled"; fillcolor="#111827";
+    postgres [label="Postgres\nsales schema\ncustomers, products, orders, order_items", fillcolor="#38bdf8", fontcolor="#082f49"];
+  }
+
+  subgraph cluster_ingest {
+    label="Landing and Auto-Ingest";
+    color="#334155"; style="rounded,filled"; fillcolor="#111827";
+    dms [label="AWS DMS\nFull load + CDC\nParquet output", fillcolor="#f59e0b", fontcolor="#451a03"];
+    s3 [label="Amazon S3\nPath: dms/sales/<table>/load_dt=YYYYMMDD/", fillcolor="#86efac", fontcolor="#052e16"];
+    snowpipe [label="Snowpipe\nContinuous S3 auto-ingest\nNotification-driven load", fillcolor="#fca5a5", fontcolor="#450a0a"];
+    raw [label="Snowflake RAW\nLanding tables with DMS metadata\nDMS_OP, DMS_COMMIT_TS, DMS_LOAD_TS", fillcolor="#fecaca", fontcolor="#450a0a"];
+  }
+
+  subgraph cluster_transform {
+    label="Warehouse Modeling";
+    color="#334155"; style="rounded,filled"; fillcolor="#111827";
+    stg [label="dbt STG\nStandardize source fields\nType casting\nDelete handling", fillcolor="#c4b5fd", fontcolor="#2e1065"];
+    inter [label="dbt INT\nIntermediate business logic\nJoins and reusable models", fillcolor="#ddd6fe", fontcolor="#2e1065"];
+    gold [label="dbt GOLD\nFinal marts\ndim_customers\ndim_products\nfct_orders\nfct_order_items", fillcolor="#fde68a", fontcolor="#422006"];
+  }
+
+  subgraph cluster_control {
+    label="Scheduling and Observability";
+    color="#334155"; style="rounded,filled"; fillcolor="#111827";
+    airflow [label="Airflow DAG\ndbt_pipeline\nsteps:\ndeps -> run stg -> run int -> run gold -> test gold", fillcolor="#67e8f9", fontcolor="#083344"];
+    consumers [label="Consumers\nBI dashboards\nSnowflake SQL users\nBusiness reports", fillcolor="#a7f3d0", fontcolor="#022c22"];
+    audit [label="Observability\nCopy history\nPipe history\nCloudWatch logs\naudit_ingestion model", fillcolor="#f9a8d4", fontcolor="#500724"];
+  }
+
+  postgres -> dms [label="extract changes"];
+  dms -> s3 [label="write parquet files"];
+  s3 -> snowpipe [label="event notification"];
+  snowpipe -> raw [label="continuous ingest"];
+  raw -> stg [label="dbt run stg"];
+  stg -> inter [label="dbt run int"];
+  inter -> gold [label="dbt run gold"];
+  gold -> consumers [label="analytics consumption"];
+
+  airflow -> stg [style=dashed, color="#22d3ee", label="task 1"];
+  airflow -> inter [style=dashed, color="#a78bfa", label="task 2"];
+  airflow -> gold [style=dashed, color="#facc15", label="task 3"];
+  airflow -> gold [style=dashed, color="#fb7185", label="dbt test"];
+  snowpipe -> audit [style=dashed, color="#f472b6", label="ingest metrics"];
+  raw -> audit [style=dashed, color="#f472b6", label="load stats"];
+}

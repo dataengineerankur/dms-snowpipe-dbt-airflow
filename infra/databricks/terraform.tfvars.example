@@ -1,0 +1,23 @@
+databricks_host = "https://<your-workspace-host>"
+databricks_token = "<your-pat-token>"
+
+job_cluster_id = "<cluster-id>"
+workspace_notebook_base_path = "/Shared/dms-snowpipe-dbt-airflow/notebooks"
+repo_path = "/Users/<email>/dms-snowpipe-dbt-airflow"
+run_as_user = "<email>"
+
+repo_url      = "https://github.com/<org>/dms-snowpipe-dbt-airflow.git"
+repo_provider = "gitHub"
+repo_branch   = "main"
+
+catalog   = "patchit"
+schema    = "walmart_lakehouse"
+s3_bucket = "dms-snowpipe-dev-05d6e64a"
+
+aws_secret_scope = "aws_s3"
+aws_access_key_name = "AWS_ACCESS_KEY_ID"
+aws_secret_key_name = "AWS_SECRET_ACCESS_KEY"
+aws_session_token_name = "AWS_SESSION_TOKEN"
+
+# job_node_type_id  = "Standard_DS3_v2"  # must match Databricks supported list
+# job_spark_version = "13.3.x-scala2.12"

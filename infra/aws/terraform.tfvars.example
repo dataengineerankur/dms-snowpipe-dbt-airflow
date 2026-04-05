@@ -73,8 +73,8 @@ athena_workgroup_name          = "dms-athena"
 athena_output_prefix           = "athena/results/"
 
 raw_prefix                      = "bronze"
-silver_prefix                   = "glue/silver"
-gold_prefix                     = "glue/gold"
+silver_prefix                   = "silver"
+gold_prefix                     = "gold"
 
 enable_datalake_ingest          = false
 datalake_source_bucket          = "dmt-datalake"

@@ -1,0 +1,10 @@
+[
+  {"sku":"WM-1001","name":"Great Value Whole Milk","category":"Groceries","price":4.29,"inventory":142,"image":"https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=900&q=80"},
+  {"sku":"WM-1002","name":"Fresh Bananas","category":"Produce","price":1.19,"inventory":260,"image":"https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=900&q=80"},
+  {"sku":"WM-1003","name":"Rotisserie Chicken","category":"Deli","price":7.98,"inventory":64,"image":"https://images.unsplash.com/photo-1518492104633-130d0cc84637?auto=format&fit=crop&w=900&q=80"},
+  {"sku":"WM-1004","name":"Family Pack Ground Beef","category":"Meat","price":12.74,"inventory":58,"image":"https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?auto=format&fit=crop&w=900&q=80"},
+  {"sku":"WM-1005","name":"Coca-Cola 12 Pack","category":"Beverages","price":8.48,"inventory":119,"image":"https://images.unsplash.com/photo-1629203851122-3726ecdf080e?auto=format&fit=crop&w=900&q=80"},
+  {"sku":"WM-1006","name":"Paper Towels Mega Roll","category":"Household","price":14.97,"inventory":83,"image":"https://images.unsplash.com/photo-1583947215259-38e31be8751f?auto=format&fit=crop&w=900&q=80"},
+  {"sku":"WM-1007","name":"Kids Backpack","category":"Back to School","price":18.88,"inventory":71,"image":"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80"},
+  {"sku":"WM-1008","name":"LED Smart TV 50 inch","category":"Electronics","price":298.0,"inventory":17,"image":"https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=900&q=80"}
+]

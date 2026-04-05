@@ -25,8 +25,8 @@ bucket = args["S3_BUCKET"]
 silver_prefix = args["SILVER_PREFIX"].rstrip("/")
 gold_prefix = args["GOLD_PREFIX"].rstrip("/")
 
-orders = spark.read.parquet(f"s3://{bucket}/{silver_prefix}/stg_orders/")
-order_items = spark.read.parquet(f"s3://{bucket}/{silver_prefix}/stg_order_items/")
+orders = spark.read.parquet(f"s3://{bucket}/{silver_prefix}/orders/")
+order_items = spark.read.parquet(f"s3://{bucket}/{silver_prefix}/order_items/")
 
 items_agg = (
     order_items.groupBy("order_id")

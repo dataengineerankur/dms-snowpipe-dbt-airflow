@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Snowflake University — Deep Dive</title>
+<style>
+:root{--line:rgba(145,185,255,.18);--text:#f4f8ff;--muted:#9fb0ce;--cyan:#4ccfff;--r:16px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#06101c,#030a14);min-height:100vh}
+body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(100,140,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(100,140,255,.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.layout{display:grid;grid-template-columns:minmax(240px,300px) 1fr;min-height:100vh;position:relative;z-index:1}
+aside{position:sticky;top:0;align-self:start;max-height:100vh;overflow:auto;padding:20px;border-right:1px solid var(--line);background:rgba(4,10,22,.92);backdrop-filter:blur(12px)}
+aside h1{font-size:1rem;margin:0 0 12px;letter-spacing:.06em;text-transform:uppercase;color:var(--cyan)}
+.toplinks{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.toplinks a{font-size:.78rem;padding:6px 10px;border-radius:999px;border:1px solid var(--line);color:var(--cyan);text-decoration:none}
+.toplinks a:hover{background:rgba(76,207,255,.12)}
+aside nav a{display:block;padding:7px 10px;margin:3px 0;border-radius:10px;color:var(--muted);text-decoration:none;font-size:.85rem;border:1px solid transparent}
+aside nav a:hover,aside nav a.active{color:var(--text);background:rgba(76,207,255,.1);border-color:rgba(76,207,255,.25)}
+main{padding:28px 36px 100px;max-width:920px}
+article{margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--line);scroll-margin-top:20px}
+article h2{margin:0 0 10px;font-size:1.4rem}
+article h3{margin:18px 0 6px;font-size:1.02rem;color:#cfe7ff}
+article p,article li{color:var(--muted);line-height:1.65;font-size:.94rem}
+article ul{padding-left:1.2rem}
+article strong{color:var(--text)}
+pre{background:rgba(3,8,16,.9);border:1px solid var(--line);border-radius:var(--r);padding:14px;overflow:auto;font-size:.8rem;color:#cde5ff;line-height:1.5}
+table{width:100%;border-collapse:collapse;font-size:.82rem;margin:12px 0}
+th,td{border:1px solid var(--line);padding:9px;text-align:left;color:var(--muted)}
+th{color:var(--text);background:rgba(255,255,255,.04)}
+@media(max-width:960px){.layout{grid-template-columns:1fr}aside{position:relative;max-height:none;border-right:0;border-bottom:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside>
+<h1>Deep dive</h1>
+<div class="toplinks">
+<a href="snowflake_university_visual_guide.html">Visual guide</a>
+<a href="snowflake_university_visual_guide.html#architecture">Architecture</a>
+<a href="snowflake_university_runbook.html">Runbook</a>
+</div>
+<nav id="nav">
+<a href="#top">Top</a>
+<a href="#dd-howto">How to use</a>
+<a href="#dd-dms">DMS / Snowpipe / dbt</a>
+<a href="#dd-retail">Retail realtime</a>
+<a href="#dd-foundation">1 · Foundation</a>
+<a href="#dd-transient">2 · Transient</a>
+<a href="#dd-streams">3 · Streams</a>
+<a href="#dd-tasks">4 · Tasks</a>
+<a href="#dd-dynamic">5 · Dynamic tables</a>
+<a href="#dd-mv">6 · Materialized views</a>
+<a href="#dd-snowpark">7 · Snowpark</a>
+<a href="#dd-snapshots">8 · Snapshots</a>
+<a href="#dd-clustering">9 · Clustering</a>
+<a href="#dd-internals">10 · Internals</a>
+<a href="#dd-iceberg">11 · Iceberg</a>
+<a href="#dd-external">12 · External tables</a>
+<a href="#dd-patterns">13 · Other patterns</a>
+<a href="#dd-ladder">Orchestration ladder</a>
+<a href="#dd-index">Script index</a>
+<a href="#dd-airflow">Airflow DAGs</a>
+</nav>
+</aside>
+<main>
+<article id="top"><h2>Snowflake University: senior-level deep dive</h2><p>Companion to the <a href="snowflake_university_visual_guide.html">visual guide</a> and <a href="snowflake_university_runbook.html">runbook</a>. Each section explains <strong>why</strong> Snowflake built the feature, <strong>what problem</strong> it solves, backend behavior at a high level, <strong>cost levers</strong>, <strong>repo paths</strong>, and how to <strong>run and observe</strong>.</p></article>
+<article id="dd-howto"><h2>How to use this doc with the repo</h2><ul>
+<li>Run scripts in order from <a href="snowflake_university_runbook.html#walkthrough">the runbook</a> (step 17 = external tables).</li>
+<li>Keep Query Profile open for performance work; use History for bytes scanned and time.</li>
+<li>dbt: from <code>dbt/</code> with <code>DBT_PROFILES_DIR=.</code> and <code>../.venv-snowflake/bin/dbt</code>.</li>
+</ul></article>
+<article id="dd-dms"><h2>DMS / Snowpipe / dbt spine</h2><p><strong>Why:</strong> Enterprise pattern: replication (DMS), durable landing (S3), governed ingest (Snowpipe), modeling (dbt), orchestration (Airflow).</p>
+<p><strong>Repo:</strong> <code>README.md</code>, <code>infra/snowflake/</code>, <code>scripts/verify_snowpipe.sql</code>, dbt <code>gold</code> models.</p>
+<p><strong>Run:</strong> <code>cd dbt && DBT_PROFILES_DIR=. ../.venv-snowflake/bin/dbt run --select gold</code></p></article>
+<article id="dd-retail"><h2>Retail realtime stack</h2><p><strong>Why:</strong> Event-driven ELT: UI → Kafka → Spark Streaming → S3 → Airflow bronze.</p>
+<p><strong>Run:</strong> <code>./scripts/start_retail_stack.sh</code> — UI :8502, Kafka :8081, Airflow :8080, DAG <code>retail_raw_to_bronze</code>.</p></article>
+<article id="dd-foundation"><h2>1. Foundation dataset</h2><p><strong>Why:</strong> Features only show real tradeoffs at meaningful scale.</p>
+<p><strong>Backend:</strong> Large inserts write micro-partitions; metadata tracks min/max for pruning.</p>
+<p><strong>Cost:</strong> Edit row targets in script; smaller WH for dev; drop unused clones.</p>
+<p><strong>Repo:</strong> <code>scripts/00_create_foundation_dataset.sql</code></p>
+<pre>SELECT COUNT(*) FROM RAW_DB.PUBLIC.RAW_ORDERS;</pre></article>
+<article id="dd-transient"><h2>2. Transient tables</h2><p><strong>Why:</strong> Cheap staging without full durability/clone semantics of permanent tables.</p>
+<p><strong>Repo:</strong> <code>scripts/01_transient_tables.sql</code>, DAG <code>transient_table_pipeline</code></p>
+<p><strong>Observe:</strong> <code>INFORMATION_SCHEMA.TABLE_STORAGE_METRICS</code>, <code>SHOW TABLES</code> in STAGING_DB / SILVER_DB.</p></article>
+<article id="dd-streams"><h2>3. Streams (CDC)</h2><p><strong>Why:</strong> Durable change cursor tied to table versions, not ad-hoc diffs.</p>
+<p><strong>Backend:</strong> Stream stores an offset; consumption advances after successful DML.</p>
+<p><strong>Cost:</strong> Steady consume schedule; single consumer; selective merges.</p>
+<p><strong>Repo:</strong> <code>scripts/02_streams.sql</code>, <code>02_streams_trigger_changes.sql</code>, <code>02_streams_consume.sql</code>, DAG <code>stream_cdc_pipeline</code></p></article>
+<article id="dd-tasks"><h2>4. Tasks</h2><p><strong>Why:</strong> SQL-native scheduling inside the warehouse.</p>
+<p><strong>Repo:</strong> <code>scripts/03_tasks.sql</code>, DAG <code>task_dag_pipeline</code></p>
+<p><strong>Observe:</strong> <code>SHOW TASKS IN SCHEMA AUDIT_DB.PUBLIC</code>, <code>PIPELINE_RUNS</code>, <code>TASK_HISTORY</code>.</p></article>
+<article id="dd-dynamic"><h2>5. Dynamic tables</h2><p><strong>Why:</strong> “Always fresh enough” without hand schedules for every layer.</p>
+<p><strong>Cost:</strong> Deterministic SQL; tune <code>TARGET_LAG</code>; watch full vs incremental refresh.</p>
+<p><strong>Repo:</strong> <code>scripts/04_dynamic_tables.sql</code></p></article>
+<article id="dd-mv"><h2>6. Materialized views</h2><p><strong>Why:</strong> Precomputed hot paths without re-scanning huge bases.</p>
+<p><strong>Cost:</strong> Create only for high reuse; monitor maintenance vs savings.</p>
+<p><strong>Repo:</strong> <code>scripts/05_materialized_views.sql</code></p></article>
+<article id="dd-snowpark"><h2>7. Snowpark</h2><p><strong>Why:</strong> Push Python close to data; governance and performance vs local pandas.</p>
+<p><strong>Repo:</strong> <code>snowpark/snowpark_pipelines.py</code>, <code>snowpark/udfs/</code>, <code>snowpark/stored_procs/</code></p>
+<pre>PYTHONPATH=$(pwd) .venv-snowflake/bin/python snowpark/snowpark_pipelines.py</pre></article>
+<article id="dd-snapshots"><h2>8. dbt snapshots (SCD2)</h2><p><strong>Why:</strong> History when sources mutate.</p>
+<p><strong>Repo:</strong> <code>dbt/snapshots/*</code>, <code>scripts/08_trigger_snapshot_changes.sql</code></p></article>
+<article id="dd-clustering"><h2>9. Clustering benchmark</h2><p><strong>Why:</strong> Pruning is the main lever for scanned bytes.</p>
+<p><strong>Repo:</strong> <code>scripts/09_clustering_benchmark.sql</code>, <code>BENCHMARKS.PUBLIC</code></p></article>
+<article id="dd-internals"><h2>10. Internals: clones, cache, monitors</h2><p><strong>Why:</strong> Fast dev copies, honest benchmarking, credit guardrails.</p>
+<p><strong>Repo:</strong> <code>scripts/10_internals_deep_dive.sql</code></p></article>
+<article id="dd-iceberg"><h2>11. Iceberg on S3</h2><p><strong>Why:</strong> Open format files + metadata on customer lake; Snowflake as control plane.</p>
+<p><strong>Repo:</strong> <code>scripts/11_iceberg_s3_lab.sql</code>, <a href="snowflake_iceberg_lab.md">snowflake_iceberg_lab.md</a></p></article>
+<article id="dd-external"><h2>12. External tables and stages</h2><p><strong>Why:</strong> SQL over curated lake files without full COPY.</p>
+<p><strong>Backend:</strong> Stage = URL + integration; external table = file metadata; queries decode at runtime; <code>REFRESH</code> / <code>AUTO_REFRESH</code>.</p>
+<p><strong>Cost:</strong> Align partitions with <code>WHERE</code>; avoid <code>SELECT *</code>; compare to Snowpipe+native for hot paths.</p>
+<p><strong>Repo:</strong> <code>scripts/12_external_tables_and_lake_patterns.sql</code> (uses <code>S3_DMS_INT</code>, prefix <code>dms/sales/orders/</code>).</p>
+<pre>LIST @EXT_DEMO.PUBLIC.DMS_ORDERS_EXT LIMIT 20;
+SHOW EXTERNAL TABLES IN SCHEMA EXT_DEMO.PUBLIC;
+SELECT COUNT(*) FROM EXT_DEMO.PUBLIC.EXT_DMS_ORDERS;</pre></article>
+<article id="dd-patterns"><h2>13. Other real-world patterns</h2><p>Patterns not all scripted here — see full table in <a href="snowflake_university_deep_dive.md">deep dive (Markdown)</a>. Includes Snowpipe, stages, secure shares, SOS, RAP/masking, tags, replication, Hybrid Tables.</p>
+<table><thead><tr><th>Pattern</th><th>In this repo</th></tr></thead><tbody>
+<tr><td>Snowpipe</td><td><code>infra/snowflake/main.tf</code>, <code>scripts/verify_snowpipe.sql</code></td></tr>
+<tr><td>Stages + LIST</td><td><code>RAW_DB.PUBLIC.RAW_STAGE</code> in streams script</td></tr>
+<tr><td>Secure shares</td><td>internals script (where present)</td></tr>
+</tbody></table></article>
+<article id="dd-ladder"><h2>Orchestration ladder</h2><ol>
+<li>SQL worksheets — one-offs</li>
+<li>Tasks — all SQL in Snowflake</li>
+<li>Airflow — cross-system (this repo)</li>
+<li>Dynamic tables — layered SQL refresh</li>
+<li>Streams + Tasks — incremental offsets</li>
+</ol></article>
+<article id="dd-index"><h2>Quick script index</h2><table><thead><tr><th>Topic</th><th>Script</th></tr></thead><tbody>
+<tr><td>Foundation</td><td><code>scripts/00_create_foundation_dataset.sql</code></td></tr>
+<tr><td>Transient</td><td><code>scripts/01_transient_tables.sql</code></td></tr>
+<tr><td>Streams</td><td><code>scripts/02_*.sql</code></td></tr>
+<tr><td>Tasks</td><td><code>scripts/03_tasks.sql</code></td></tr>
+<tr><td>Dynamic tables</td><td><code>scripts/04_dynamic_tables.sql</code></td></tr>
+<tr><td>Materialized views</td><td><code>scripts/05_materialized_views.sql</code></td></tr>
+<tr><td>Snowpark</td><td><code>snowpark/snowpark_pipelines.py</code></td></tr>
+<tr><td>Snapshots</td><td><code>scripts/08_trigger_snapshot_changes.sql</code></td></tr>
+<tr><td>Clustering</td><td><code>scripts/09_clustering_benchmark.sql</code></td></tr>
+<tr><td>Internals</td><td><code>scripts/10_internals_deep_dive.sql</code></td></tr>
+<tr><td>Iceberg</td><td><code>scripts/11_iceberg_s3_lab.sql</code></td></tr>
+<tr><td>External tables</td><td><code>scripts/12_external_tables_and_lake_patterns.sql</code></td></tr>
+</tbody></table></article>
+<article id="dd-airflow"><h2>Airflow DAGs</h2><ul>
+<li><code>snowflake_master_pipeline</code>, <code>stream_cdc_pipeline</code>, <code>task_dag_pipeline</code>, <code>transient_table_pipeline</code> — <code>airflow/dags/</code></li>
+<li>Retail: <code>retail_raw_to_bronze</code></li>
+<li>UI: <code>http://localhost:8080</code> when Compose is up</li>
+</ul></article>
+
+</main>
+</div>
+<script>
+const nav=document.getElementById('nav');
+const links=[...nav.querySelectorAll('a')];
+const map=new Map(links.map(a=>[a.getAttribute('href').slice(1),a]));
+const obs=new IntersectionObserver((ents)=>{
+ents.forEach(e=>{
+if(!e.isIntersecting)return;
+const id=e.target.id;if(!id)return;
+links.forEach(l=>l.classList.remove('active'));
+const a=map.get(id);if(a)a.classList.add('active');
+});
+},{rootMargin:'-12% 0px -62% 0px',threshold:0});
+document.querySelectorAll('main article[id]').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

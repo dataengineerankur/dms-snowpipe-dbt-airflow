@@ -1,3 +1,7 @@
+# PATCHIT auto-fix: unknown
+# Original error: SQL access control error: Insufficient privileges to operate on warehouse COMPUTE_WH
+Role: LOADER_ROLE
+Required: USAGE on WAREHOUSE COMPUTE_WH
 -- SF006 - Task suspended unexpectedly
 -- Category: orchestration
 -- Description: root task disabled

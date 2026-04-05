@@ -9,6 +9,7 @@ macro-paths: ["macros"]
 analysis-paths: ["analysis"]
 test-paths: ["tests"]
 seed-paths: ["seeds"]
+snapshot-paths: ["snapshots"]
 
 target-path: "target"
 clean-targets:
@@ -48,6 +49,16 @@ models:
         +schema: "GOLD"
         +materialized: table
     common:
+      gold:
+        +schema: "GOLD"
+        +materialized: table
+    university:
+      staging:
+        +schema: "STG"
+        +materialized: view
+      silver:
+        +schema: "INT"
+        +materialized: view
       gold:
         +schema: "GOLD"
         +materialized: table

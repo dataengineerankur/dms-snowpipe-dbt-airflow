@@ -15,5 +15,5 @@ output "pipe_notification_channels" {
     orders      = snowflake_pipe.orders.notification_channel
     order_items = snowflake_pipe.order_items.notification_channel
   }
-  description = "SNS topic ARNs for Snowpipe auto-ingest."
+  description = "SQS queue ARNs (notification_channel) for Snowpipe auto-ingest; map into infra/aws snowpipe_sqs_queue_arns."
 }

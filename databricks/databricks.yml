@@ -9,7 +9,7 @@ variables:
     description: Existing Databricks cluster id for job tasks
   catalog:
     description: Target catalog name
-    default: main
+    default: patchit
   schema:
     description: Target schema/database name
     default: walmart_lakehouse
