@@ -1,3 +1,8 @@
+# PATCHIT auto-fix: fix_trigger_rule
+# Original error: Task 'send_notification' skipped: upstream 'run_dbt' is in 'failed' state.
+Trigger rule: all_success
+DAG: dbt_pipeline
+Consider using trigger_rule='all_done' if notification should always run.
 from datetime import datetime
 
 from airflow import DAG

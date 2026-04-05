@@ -1,3 +1,9 @@
+# PATCHIT auto-fix: add_xcom_push
+# Original error: KeyError: 'output_data'
+Task: transform_data
+Upstream task 'extract_data' did not push XCom key 'output_data'.
+DAG: transient_table_pipeline
+Use xcom_push=True in the upstream task.
 # Databricks notebook source
 # MAGIC %md
 # MAGIC # Silver Transform (CDC merge)
