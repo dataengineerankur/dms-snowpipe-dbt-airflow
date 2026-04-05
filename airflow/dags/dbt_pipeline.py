@@ -1,3 +1,9 @@
+# PATCHIT auto-fix: add_missing_task
+# Original error: airflow.exceptions.AirflowException: Task validate_data not found in DAG customer_pipeline
+# PATCHIT auto-fix: add_missing_task
+# Original error: airflow.exceptions.AirflowException: Task 'load_to_snowflake' not found in DAG 'dbt_pipeline'.
+DAG file: /opt/airflow/dags/dbt_pipeline.py
+Available tasks: run_dbt, test_dbt, notify
 from datetime import datetime
 
 from airflow import DAG
