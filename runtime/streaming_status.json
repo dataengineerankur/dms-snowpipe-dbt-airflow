@@ -1,0 +1,8 @@
+{
+  "state": "running",
+  "updated_at": "2026-04-01T22:01:02.848416+00:00",
+  "batch_id": 4,
+  "batch_count": 1,
+  "last_successful_batch": 4,
+  "target": "s3a://dms-snowpipe-dev-05d6e64a/retail-live/raw/transactions"
+}

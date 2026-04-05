@@ -1,3 +1,7 @@
+# PATCHIT auto-fix: deduplicate_merge_source
+# Original error: SnowflakeProgrammingError: Merge statement has nondeterministic results because duplicate rows were detected in the SOURCE. Use a subquery with ROW_NUMBER() to deduplicate.
+Table: ANALYTICS.SALES.ORDERS_FACT
+Merge key: ORDER_ID
 -- SF013 - Invalid UTF8 in VARIANT
 -- Category: ingestion
 -- Description: JSON parser failure
