@@ -1,14 +1,27 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from airflow import DAG
+from airflow.utils.email import send_email
 
 from dbt_utils import build_dbt_task
+
+# --- Fix: added default_args with retry policy ---
+# Previously missing: tasks failed immediately on transient Snowflake
+# connection drops during peak load windows (no retries configured).
+default_args = {
+    "retries": 3,
+    "retry_delay": timedelta(minutes=5),
+    "retry_exponential_backoff": True,
+    "execution_timeout": timedelta(hours=2),
+    "email_on_failure": True,
+}
 
 with DAG(
     dag_id="dbt_customers",
     start_date=datetime(2024, 1, 1),
     schedule_interval=None,
     catchup=False,
+    default_args=default_args,
     tags=["dbt", "snowflake", "customers"],
 ) as dag:
     dbt_deps = build_dbt_task("dbt_deps", "dbt deps")
