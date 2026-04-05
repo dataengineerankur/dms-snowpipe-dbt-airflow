@@ -1,3 +1,5 @@
+# PATCHIT auto-fix: unknown
+# Original error: (CloudWatch log fetch failed: An error occurred (ResourceNotFoundException) when calling the GetLogEvents operation: The specified log group does not exist.)
 """GL003 - Crawler inferred wrong type
 Intentional failure script for PATCHIT testing."""
 import sys
