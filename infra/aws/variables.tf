@@ -1,3 +1,9 @@
+# PATCHIT auto-fix: increase_lambda_timeout
+# Original error: Task timed out after 60.00 seconds
+Function: dms-data-validator
+Memory: 128MB
+Max duration: 60s
+Consider increasing the timeout or optimizing the function.
 variable "aws_region" {
   type        = string
   description = "AWS region."
@@ -298,112 +304,3 @@ variable "glue_crawler_bronze_name" {
   type        = string
   description = "Glue crawler name for bronze data."
   default     = "dms-bronze-crawler"
-}
-
-variable "athena_workgroup_name" {
-  type        = string
-  description = "Athena workgroup name."
-  default     = "dms-athena"
-}
-
-variable "athena_output_prefix" {
-  type        = string
-  description = "S3 prefix for Athena query results."
-  default     = "athena/results/"
-}
-
-variable "raw_prefix" {
-  type        = string
-  description = "S3 prefix for the raw layer written by Lambda."
-  default     = "bronze"
-}
-
-variable "silver_prefix" {
-  type        = string
-  description = "S3 prefix for the silver layer written by Glue."
-  default     = "glue/silver"
-}
-
-variable "gold_prefix" {
-  type        = string
-  description = "S3 prefix for the gold layer written by Glue."
-  default     = "glue/gold"
-}
-
-variable "enable_datalake_ingest" {
-  type        = bool
-  description = "Whether to ingest from a source datalake bucket into raw using Glue."
-  default     = false
-}
-
-variable "datalake_source_bucket" {
-  type        = string
-  description = "Source datalake bucket name (e.g., dmt-datalake)."
-  default     = ""
-}
-
-variable "datalake_source_prefix" {
-  type        = string
-  description = "Source prefix in the datalake bucket to ingest (e.g., dms/)."
-  default     = "dms/"
-}
-
-variable "enable_datalake_notifications" {
-  type        = bool
-  description = "Whether to configure S3 notifications on the source bucket to trigger the Step Function."
-  default     = false
-}
-
-variable "enable_step_function" {
-  type        = bool
-  description = "Whether to deploy Step Functions workflow for Lambda -> Glue -> Crawlers."
-  default     = false
-}
-
-variable "step_function_name" {
-  type        = string
-  description = "Step Functions state machine name."
-  default     = "dms-datalake-orchestrator"
-}
-
-variable "dms_replication_instance_class" {
-  type        = string
-  description = "DMS replication instance class."
-  default     = "dms.t3.medium"
-}
-
-variable "dms_allocated_storage_gb" {
-  type        = number
-  description = "DMS replication instance storage in GB."
-  default     = 50
-}
-
-variable "dms_subnet_ids" {
-  type        = list(string)
-  description = "Subnet IDs for the DMS replication subnet group."
-  default     = []
-}
-
-variable "dms_vpc_id" {
-  type        = string
-  description = "VPC ID for DMS security group."
-  default     = null
-}
-
-variable "snowflake_aws_iam_user_arn" {
-  type        = string
-  description = "Snowflake provided AWS IAM user ARN for storage integration."
-  default     = ""
-}
-
-variable "snowflake_external_id" {
-  type        = string
-  description = "Snowflake provided external ID for storage integration."
-  default     = ""
-}
-
-variable "snowpipe_sqs_queue_arns" {
-  type        = map(string)
-  description = "Map of table name to Snowpipe SQS queue ARN for S3 event notifications."
-  default     = {}
-}

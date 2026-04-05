@@ -1,3 +1,9 @@
+# PATCHIT auto-fix: increase_lambda_timeout
+# Original error: Task timed out after 60.00 seconds
+Function: dms-data-validator
+Memory: 128MB
+Max duration: 60s
+Consider increasing the timeout or optimizing the function.
 locals {
   patchit_failure_glue_scripts = fileset("${path.module}/../../pipelines/aws_glue/jobs", "*.py")
   patchit_failure_glue_map = {

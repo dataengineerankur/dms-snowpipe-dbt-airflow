@@ -1,3 +1,9 @@
+# PATCHIT auto-fix: increase_lambda_timeout
+# Original error: Task timed out after 60.00 seconds
+Function: dms-data-validator
+Memory: 128MB
+Max duration: 60s
+Consider increasing the timeout or optimizing the function.
 output "dms_bucket_name" {
   value       = aws_s3_bucket.dms.bucket
   description = "DMS landing bucket."

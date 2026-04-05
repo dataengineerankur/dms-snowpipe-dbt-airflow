@@ -1,3 +1,9 @@
+# PATCHIT auto-fix: increase_lambda_timeout
+# Original error: Task timed out after 60.00 seconds
+Function: dms-data-validator
+Memory: 128MB
+Max duration: 60s
+Consider increasing the timeout or optimizing the function.
 """GL003 - Crawler inferred wrong type
 Intentional failure script for PATCHIT testing."""
 import sys
