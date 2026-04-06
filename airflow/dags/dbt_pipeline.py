@@ -1,3 +1,8 @@
+# PATCHIT auto-fix: unknown
+# Classification: unknown
+# Error summary: airflow.exceptions.AirflowException: Silent failure. email_on_failure=False. Set email_on_failure=True and configure SMTP in default_args.
+# TODO: Apply unknown — see PR description for manual steps
+
 from datetime import datetime
 
 from airflow import DAG
