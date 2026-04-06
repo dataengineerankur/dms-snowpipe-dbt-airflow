@@ -1,4 +1,10 @@
 # PATCHIT auto-fix: unknown
+# Original error: snowflake.connector.errors.OperationalError: Connection reset by peer. retries=0. Add retries=3 and retry_exponential_backoff=True.
+# PATCHIT auto-fix: add_backoff
+# Original error: snowflake.connector.errors.OperationalError: 429 Too Many Requests — catchup=True triggered backfill. Set catchup=False in DAG args.
+# PATCHIT auto-fix: unknown
+# Original error: airflow.exceptions.AirflowException: Silent failure. email_on_failure=False. Set email_on_failure=True and configure SMTP in default_args.
+# PATCHIT auto-fix: unknown
 # Original error: :57:04.458+0000] {task_command.py:426} INFO - Running <TaskInstance: patchit_airflow_issue_001.fail_af001 manual__2026-04-05T20:53:30+00:00 [running]> on host 6a47af29e643
 [2026-04-05T20:57:04.552+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='patchit' AIRFLOW_CTX_DAG_ID='patchit_***_issue_001' AIRFLOW_CTX_TASK_ID='fail_af001' AIRFLOW_CTX_EXECUTION_DATE='2026-04-05T20:53:30+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-04-05T20:53:30+00:00'
 [2026-04-05T20:57:04.553+0000] {taskinstance.py:430} INFO - ::endgroup::
@@ -294,37 +300,3 @@ with DAG(
             "behavior": _behavior_from_category("ingestion", 11),
         },
     )
-
-
-with DAG(
-    dag_id="patchit_airflow_issue_012",
-    start_date=datetime(2024, 1, 1),
-    schedule="@daily",
-    catchup=False,
-    default_args=default_args,
-    tags=["patchit", "failure-pack", "ingestion", "af012"]
-) as dag_12:
-    fail_task = PythonOperator(
-        task_id="fail_af012",
-        python_callable=_fail,
-        op_kwargs={
-            "issue_id": "AF012",
-            "title": "Truncated file in landing zone",
-            "category": "ingestion",
-            "behavior": _behavior_from_category("ingestion", 12),
-        },
-    )
-
-
-with DAG(
-    dag_id="patchit_airflow_issue_013",
-    start_date=datetime(2024, 1, 1),
-    schedule="@daily",
-    catchup=False,
-    default_args=default_args,
-    tags=["patchit", "failure-pack", "ingestion", "af013"]
-) as dag_13:
-    fail_task = PythonOperator(
-        task_id="fail_af013",
-        python_callable=_fail,
-        op_kwargs={
