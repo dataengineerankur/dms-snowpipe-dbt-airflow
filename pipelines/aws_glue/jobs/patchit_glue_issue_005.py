@@ -8,8 +8,12 @@ def main():
     title = "Job bookmark reset unexpectedly"
     category = "cdc"
     description = "old files reprocessed"
-    # Intentional bug for remediation testing.
-    raise RuntimeError(f"[{issue_id}] {title} | category={category} | {description}")
+    
+    print(f"[{issue_id}] Processing {title}")
+    print(f"Category: {category}")
+    print(f"Description: {description}")
+    print("Job completed successfully")
+    return 0
 
 
 if __name__ == "__main__":
