@@ -1,3 +1,9 @@
+# PATCHIT auto-fix: add_key_check
+# Classification: key_error
+# Error summary: Traceback (most recent call last):
+  File "/Users/ankurchopra/repo_projects/dms-snowpipe-dbt-airflow/airflow/dags/patchit_test_incident_dag.py", line 
+# TODO: Apply add_key_check — see PR description for manual steps
+
 """
 PATCHIT End-to-End Test DAG — Airflow Incident #001
 ======================================================
