@@ -1,3 +1,8 @@
+# PATCHIT auto-fix: unknown
+# Classification: unknown
+# Error summary: 'count'
+# TODO: Apply unknown — see PR description for manual steps
+
 """
 PATCHIT End-to-End Test DAG — Airflow Incident #001
 ======================================================
