@@ -36,7 +36,7 @@ def read_raw(table):
 def dedupe_latest(df, key_col, ts_cols):
     order_cols = [F.col(c).desc_nulls_last() for c in ts_cols if c in df.columns]
     if not order_cols:
-        order_cols = [F.lit(0)]
+        raise ValueError("No timestamp column found for deduplication")
     w = Window.partitionBy(key_col).orderBy(*order_cols)
     return df.withColumn("rn", F.row_number().over(w)).filter(F.col("rn") == 1).drop("rn")
 
