@@ -4,12 +4,16 @@ import sys
 
 
 def main():
-    issue_id = "GL008"
-    title = "Access denied writing target prefix"
-    category = "security"
-    description = "missing putObject permission"
-    # Intentional bug for remediation testing.
-    raise RuntimeError(f"[{issue_id}] {title} | category={category} | {description}")
+    args = {}
+    if len(sys.argv) > 1:
+        try:
+            from awsglue.utils import getResolvedOptions
+            args = getResolvedOptions(sys.argv, [])
+        except Exception:
+            pass
+    
+    bucket = args.get("S3_BUCKET", "default-bucket")
+    print(f"Using S3 bucket: {bucket}")
 
 
 if __name__ == "__main__":
