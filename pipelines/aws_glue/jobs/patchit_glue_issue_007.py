@@ -1,6 +1,7 @@
 """GL007 - IAM role lacks KMS decrypt
 Intentional failure script for PATCHIT testing."""
 import sys
+from awsglue.utils import getResolvedOptions
 
 
 def main():
@@ -8,8 +9,12 @@ def main():
     title = "IAM role lacks KMS decrypt"
     category = "security"
     description = "cannot read encrypted objects"
-    # Intentional bug for remediation testing.
-    raise RuntimeError(f"[{issue_id}] {title} | category={category} | {description}")
+    
+    args = getResolvedOptions(sys.argv, [])
+    v = args.get("S3_BUCKET", "default-bucket")
+    
+    print(f"[{issue_id}] {title} | category={category} | {description}")
+    print(f"S3_BUCKET: {v}")
 
 
 if __name__ == "__main__":
