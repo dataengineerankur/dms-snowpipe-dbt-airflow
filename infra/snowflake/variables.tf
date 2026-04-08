@@ -47,3 +47,9 @@ variable "transform_wh_size" {
   description = "Warehouse size for transforms."
   default     = "SMALL"
 }
+
+variable "compute_wh_size" {
+  type        = string
+  description = "Warehouse size for compute/loader operations."
+  default     = "XSMALL"
+}
