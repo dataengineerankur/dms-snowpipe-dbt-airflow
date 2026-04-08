@@ -17,13 +17,16 @@ items AS (
   FROM {{ ref('int_order_items') }}
   GROUP BY ORDER_ID
 ),
+customers AS (
+  SELECT * FROM {{ ref('dim_customers') }}
+),
 final AS (
   SELECT
     orders.ORDER_ID,
     orders.CUSTOMER_ID,
-    orders.FIRST_NAME,
-    orders.LAST_NAME,
-    orders.EMAIL,
+    customers.FIRST_NAME,
+    customers.LAST_NAME,
+    customers.EMAIL,
     orders.ORDER_STATUS,
     orders.ORDER_DATE,
     orders.ORDER_UPDATED_AT,
@@ -36,6 +39,8 @@ final AS (
   FROM orders
   LEFT JOIN items
     ON orders.ORDER_ID = items.ORDER_ID
+  LEFT JOIN customers
+    ON orders.CUSTOMER_ID = customers.CUSTOMER_ID
 )
 
 SELECT * FROM final
