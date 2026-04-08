@@ -1,7 +1,15 @@
--- SF001 - Warehouse not available
--- Category: warehouse
--- Description: configured virtual warehouse does not exist
--- Intentional failure for PATCHIT testing.
+-- SF001 - Invalid column identifier  
+-- Category: schema
+-- Description: Referenced column no longer exists in table
+-- Snowflake billing transformation query
 
-USE ROLE PATCHIT_NON_EXISTENT_ROLE;
-SELECT * FROM MISSING_DB.MISSING_SCHEMA.MISSING_TABLE_1;
+SELECT 
+  ORDER_ITEM_ID,
+  ORDER_ID,
+  PRODUCT_ID,
+  QUANTITY,
+  UNIT_PRICE,
+  QUANTITY * UNIT_PRICE AS LINE_TOTAL,
+  CREATED_AT
+FROM ANALYTICS.RAW.ORDER_ITEMS
+WHERE QUANTITY * UNIT_PRICE > 100;
