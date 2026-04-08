@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import random
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.sensors.python import PythonSensor
 
 
 def _fail(issue_id: str, title: str, category: str, behavior: str):
@@ -2043,5 +2044,26 @@ with DAG(
             "category": "release",
             "behavior": _behavior_from_category("release", 100),
         },
+    )
+
+
+def _check_partner_file():
+    return True
+
+
+with DAG(
+    dag_id="airflow_daily_partner_ingest",
+    start_date=datetime(2024, 1, 1),
+    schedule="@daily",
+    catchup=False,
+    default_args=default_args,
+    tags=["patchit", "upstream_orchestration", "partner_ingest"]
+) as partner_dag:
+    wait_for_partner_drop = PythonSensor(
+        task_id="wait_for_partner_drop",
+        python_callable=_check_partner_file,
+        timeout=3600,
+        poke_interval=60,
+        mode="reschedule",
     )
 
