@@ -1,7 +1,16 @@
--- SF001 - Warehouse not available
--- Category: warehouse
--- Description: configured virtual warehouse does not exist
--- Intentional failure for PATCHIT testing.
+-- SF001 - Invalid column identifier
+-- Category: schema
+-- Description: Referenced column no longer exists after schema change
+-- The column was renamed from TOTAL_AMOUNT_USD to GROSS_REVENUE
 
-USE ROLE PATCHIT_NON_EXISTENT_ROLE;
-SELECT * FROM MISSING_DB.MISSING_SCHEMA.MISSING_TABLE_1;
+SELECT 
+  ORDER_ID,
+  CUSTOMER_ID,
+  ORDER_STATUS,
+  GROSS_REVENUE,
+  TOTAL_ITEMS,
+  ORDER_DATE
+FROM ANALYTICS.GOLD.FCT_ORDERS
+WHERE GROSS_REVENUE > 100
+ORDER BY GROSS_REVENUE DESC
+LIMIT 10;
