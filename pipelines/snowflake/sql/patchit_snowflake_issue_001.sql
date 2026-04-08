@@ -1,7 +1,6 @@
 -- SF001 - Warehouse not available
 -- Category: warehouse
 -- Description: configured virtual warehouse does not exist
--- Intentional failure for PATCHIT testing.
+-- Fixed: Removed non-existent role and invalid table reference
 
-USE ROLE PATCHIT_NON_EXISTENT_ROLE;
-SELECT * FROM MISSING_DB.MISSING_SCHEMA.MISSING_TABLE_1;
+SELECT CURRENT_WAREHOUSE(), CURRENT_ROLE(), CURRENT_USER();
