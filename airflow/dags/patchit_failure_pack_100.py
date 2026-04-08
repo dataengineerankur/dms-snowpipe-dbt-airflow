@@ -24,7 +24,9 @@ def _fail(issue_id: str, title: str, category: str, behavior: str):
         raise RuntimeError(msg + " | CDC inconsistency detected")
     if behavior == "dq":
         raise AssertionError(msg + " | data quality guard failed")
-    raise Exception(msg + " | generic pipeline failure")
+    if behavior == "generic":
+        raise RuntimeError(msg + " | generic pipeline failure")
+    raise RuntimeError(msg + " | unhandled behavior type")
 
 
 def _behavior_from_category(cat: str, idx: int) -> str:
