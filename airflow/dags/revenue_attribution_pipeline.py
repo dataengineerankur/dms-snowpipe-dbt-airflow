@@ -96,10 +96,8 @@ def extract_and_attribute(**context) -> None:
 
         campaign_meta = campaigns.get(cid, {})
 
-        # BUG 1: channels can be None when the campaign JSON has no 'channels' key.
-        # Fix should be: channel_weights = campaign_meta.get("channels") or {}
-        channel_weights = campaign_meta.get("channels")
-        for ch, weight in channel_weights.items():          # ← AttributeError here
+        channel_weights = campaign_meta.get("channels") or {}
+        for ch, weight in channel_weights.items():
             attributed.append({
                 "order_id": order["order_id"],
                 "campaign_id": cid,
