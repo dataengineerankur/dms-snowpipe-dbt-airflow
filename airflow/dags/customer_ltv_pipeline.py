@@ -58,9 +58,8 @@ def compute_ltv_scores(**context) -> None:
         seg_cfg = segments.get(customer["segment"], {})
         multiplier = seg_cfg.get("multiplier", 1.0)
 
-        # BUG: first_order_date is a string "YYYY-MM-DD" but datetime.now() is a datetime
-        # Subtracting a string from a datetime raises TypeError
-        age_days = (datetime.now() - customer["first_order_date"]).days
+        first_order_dt = datetime.strptime(customer["first_order_date"], "%Y-%m-%d")
+        age_days = (datetime.now() - first_order_dt).days
 
         ltv = customer["total_spend_usd"] * multiplier * (1 + age_days / 365)
         scored.append({
@@ -86,9 +85,8 @@ def build_ltv_summary(**context) -> None:
 
         total_ltv = sum(c["ltv_score"] for c in qualified_customers)
 
-        # BUG: when no customers exist for a segment, len(qualified_customers) == 0
-        # causing ZeroDivisionError
-        avg_ltv = total_ltv / len(qualified_customers)
+        count = len(qualified_customers)
+        avg_ltv = total_ltv / count if count > 0 else 0.0
 
         summary[seg] = {
             "count": len(qualified_customers),
