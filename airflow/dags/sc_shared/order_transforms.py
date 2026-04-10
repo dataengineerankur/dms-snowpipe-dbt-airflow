@@ -55,8 +55,7 @@ def parse_order_record(row: dict[str, Any]) -> dict[str, Any]:
         "unit_price":   float(row["unit_price"]),
         "ship_date":    row.get("ship_date", ""),
         "region":       row.get("region", "UNKNOWN"),
-        # BUG: no default value — wholesale orders omit this field → returns None
-        "discount_rate": row.get("discount_rate"),
+        "discount_rate": float(row["discount_rate"]) if row.get("discount_rate") is not None else 0.0,
     }
 
 
