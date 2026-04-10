@@ -133,7 +133,10 @@ def apply_discount_pricing(**context) -> None:
         qty = order["order_qty"]
         unit_cost = order["unit_cost"]
 
-        supplier_info = catalog[sku]
+        supplier_info = catalog.get(sku)
+        if supplier_info is None:
+            log.warning("SKU %s missing from supplier catalog — skipping discount pricing", sku)
+            continue
         tiers = supplier_info["discount_tiers"]
 
         applicable_discount = 0.0
