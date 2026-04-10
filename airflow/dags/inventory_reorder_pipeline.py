@@ -175,7 +175,8 @@ def validate_and_approve(**context) -> None:
             approved.append(order)
 
     total_approved_spend = sum(o["net_value"] for o in approved)
-    avg_staleness = sum(o["staleness_days"] for o in approved) / len(approved)
+    avg_staleness = (sum(o["staleness_days"] for o in approved) / len(approved)
+                     if approved else 0.0)
 
     summary = {
         "approved_count": len(approved),
