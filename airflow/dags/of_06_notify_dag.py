@@ -38,8 +38,8 @@ def send_notifications_task(**context) -> None:
         tracking_id = record.get("tracking_id", "N/A")
         customer_id = record["customer_id"]
 
-        carrier_name = CARRIER_NAMES[carrier_id]
-        template = NOTIFICATION_TEMPLATES[carrier_id]
+        carrier_name = CARRIER_NAMES[str(carrier_id)]
+        template = NOTIFICATION_TEMPLATES[str(carrier_id)]
         message = template.format(tracking_id=tracking_id)
 
         log.info(
