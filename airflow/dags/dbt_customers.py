@@ -18,6 +18,11 @@ default_args = {
 
 with DAG(
     dag_id="dbt_customers",
+    default_args={
+        "retries": 1,
+        "retry_delay": timedelta(minutes=5),
+        "email_on_failure": True,
+    },
     start_date=datetime(2024, 1, 1),
     schedule_interval=None,
     catchup=False,
