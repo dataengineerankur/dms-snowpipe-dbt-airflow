@@ -35,6 +35,8 @@ def generate_report_task(**context) -> None:
 
     for record in records:
         # compute_line_total uses record["discount_rate"] which is None for wholesale orders
+        if record.get("discount_rate") is None:
+            record = {**record, "discount_rate": 0.0}
         net_total = compute_line_total(record)
         grand_total += net_total
 
