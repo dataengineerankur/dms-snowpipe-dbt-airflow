@@ -1,0 +1,20 @@
+{
+  "carriers": {
+    "101": "FedEx Ground",
+    "102": "UPS Standard",
+    "103": "DHL Express",
+    "104": "USPS Priority"
+  },
+  "sla_days": {
+    "101": 3,
+    "102": 4,
+    "103": 2,
+    "104": 5
+  },
+  "notification_templates": {
+    "101": "Your order is on its way with FedEx. Tracking: {tracking_id}",
+    "102": "Your order is on its way with UPS. Tracking: {tracking_id}",
+    "103": "Your order is on its way with DHL. Tracking: {tracking_id}",
+    "104": "Your order is on its way with USPS. Tracking: {tracking_id}"
+  }
+}
