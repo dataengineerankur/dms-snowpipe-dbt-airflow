@@ -8,11 +8,17 @@ x-airflow-common:
   environment:
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AIRFLOW__DATABASE__SQL_ALCHEMY_CONN:-postgresql+psycopg2://airflow:airflow@postgres/airflow}
     AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "false"
     AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY:-}
     AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY:-}
-    PIP_ADDITIONAL_REQUIREMENTS: "apache-airflow-providers-docker==3.8.0 apache-airflow-providers-amazon==8.26.0"
+    PIP_ADDITIONAL_REQUIREMENTS: >-
+      apache-airflow-providers-docker==3.8.0
+      apache-airflow-providers-amazon==8.26.0
+      apache-airflow-providers-snowflake==5.7.1
+      snowflake-connector-python==3.10.0
+      snowflake-sqlalchemy==1.6.1
     DBT_IMAGE: ${DBT_IMAGE:-dms-dbt-runner:latest}
     DBT_EXECUTION_MODE: ${DBT_EXECUTION_MODE:-local}
   volumes:
