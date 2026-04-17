@@ -1,3 +1,4 @@
+import os
 import sys
 from awsglue.context import GlueContext
 from awsglue.job import Job
@@ -24,7 +25,7 @@ spark = glue_context.spark_session
 job = Job(glue_context)
 job.init(args["JOB_NAME"], args)
 
-bucket = args.get("S3_BUCKET", "default-dms-bucket")
+bucket = os.environ.get("S3_BUCKET", "analytics-curated")
 raw_prefix = args["RAW_PREFIX"].rstrip("/")
 silver_prefix = args["SILVER_PREFIX"].rstrip("/")
 
