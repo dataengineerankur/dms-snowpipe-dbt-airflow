@@ -56,6 +56,7 @@ def gold_customers():
         "dms_commit_ts",
     )
     merge_table(src, f"{catalog}.{schema}.gold_dim_customers", ["customer_id"])
+    return src.count()
 
 
 def gold_products():
@@ -70,6 +71,7 @@ def gold_products():
         "dms_commit_ts",
     )
     merge_table(src, f"{catalog}.{schema}.gold_dim_products", ["product_id"])
+    return src.count()
 
 
 def gold_orders():
@@ -109,6 +111,7 @@ def gold_orders():
         )
     )
     merge_table(fct_orders, f"{catalog}.{schema}.gold_fct_orders", ["order_id"])
+    orders_count = fct_orders.count()
 
     order_items = spark.table(f"{catalog}.{schema}.silver_order_items").select(
         "order_item_id",
@@ -120,13 +123,16 @@ def gold_orders():
         F.col("updated_at").alias("record_updated_at"),
     )
     merge_table(order_items, f"{catalog}.{schema}.gold_fct_order_items", ["order_item_id"])
+    items_count = order_items.count()
+    
+    return orders_count + items_count
 
 
 if domain == "customers":
-    gold_customers()
+    total_records = gold_customers()
 elif domain == "products":
-    gold_products()
+    total_records = gold_products()
 else:
-    gold_orders()
+    total_records = gold_orders()
 
-dbutils.notebook.exit(f"Gold transform completed for domain={domain}")
+dbutils.notebook.exit(f"Gold transform completed for domain={domain}, total_records={total_records}")
