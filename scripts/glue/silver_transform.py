@@ -10,7 +10,6 @@ args = getResolvedOptions(
     sys.argv,
     [
         "JOB_NAME",
-        "S3_BUCKET",
     ],
 )
 
@@ -20,7 +19,15 @@ spark = glue_context.spark_session
 job = Job(glue_context)
 job.init(args["JOB_NAME"], args)
 
-bucket = args["S3_BUCKET"]
+bucket = args.get("S3_BUCKET")
+if not bucket:
+    for arg in sys.argv:
+        if arg.startswith("--S3_BUCKET="):
+            bucket = arg.split("=", 1)[1]
+            break
+if not bucket:
+    import os
+    bucket = os.environ.get("S3_BUCKET", "default-dms-bucket")
 
 today = F.date_format(F.current_date(), "yyyyMMdd")
 
