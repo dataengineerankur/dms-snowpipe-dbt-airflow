@@ -42,11 +42,15 @@ with DAG(
     doc_md=__doc__,
 ) as dag:
 
-    # Wait for Bronze ingest to finish on the same day
+    # Wait for Bronze ingest to finish.
+    # execution_delta=timedelta(0) means: look for bronze with the same execution_date.
+    # When triggering manually, always use --exec-date matching the bronze run_id,
+    # OR pass execution_date_fn=lambda dt: dt (default) if schedules are aligned.
     wait_bronze = ExternalTaskSensor(
         task_id="wait_for_bronze_ingest",
         external_dag_id="mssql_01_ingest_bronze",
         external_task_id="report_bronze_counts",
+        execution_delta=timedelta(0),
         timeout=3600,
         poke_interval=60,
         mode="reschedule",
