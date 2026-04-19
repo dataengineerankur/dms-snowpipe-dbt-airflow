@@ -1,6 +1,8 @@
 .DS_Store
 .env
-.env.*
+.env.local
+.env.*.local
+# .env.example is intentionally tracked
 *.log
 *.pid
 *.swp
