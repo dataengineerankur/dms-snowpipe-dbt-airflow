@@ -12,6 +12,10 @@ resources:
               catalog: ${var.catalog}
               schema: ${var.schema}
               bucket: ${var.s3_bucket}
+              aws_secret_scope: ${var.aws_secret_scope}
+              aws_access_key_name: ${var.aws_access_key_name}
+              aws_secret_key_name: ${var.aws_secret_key_name}
+              aws_session_token_name: ${var.aws_session_token_name}
           existing_cluster_id: ${var.cluster_id}
         - task_key: silver_customers
           depends_on:
@@ -23,6 +27,10 @@ resources:
               catalog: ${var.catalog}
               schema: ${var.schema}
               bucket: ${var.s3_bucket}
+              aws_secret_scope: ${var.aws_secret_scope}
+              aws_access_key_name: ${var.aws_access_key_name}
+              aws_secret_key_name: ${var.aws_secret_key_name}
+              aws_session_token_name: ${var.aws_session_token_name}
           existing_cluster_id: ${var.cluster_id}
         - task_key: gold_customers
           depends_on:
@@ -47,6 +55,10 @@ resources:
               catalog: ${var.catalog}
               schema: ${var.schema}
               bucket: ${var.s3_bucket}
+              aws_secret_scope: ${var.aws_secret_scope}
+              aws_access_key_name: ${var.aws_access_key_name}
+              aws_secret_key_name: ${var.aws_secret_key_name}
+              aws_session_token_name: ${var.aws_session_token_name}
           existing_cluster_id: ${var.cluster_id}
         - task_key: silver_products
           depends_on:
@@ -58,6 +70,10 @@ resources:
               catalog: ${var.catalog}
               schema: ${var.schema}
               bucket: ${var.s3_bucket}
+              aws_secret_scope: ${var.aws_secret_scope}
+              aws_access_key_name: ${var.aws_access_key_name}
+              aws_secret_key_name: ${var.aws_secret_key_name}
+              aws_session_token_name: ${var.aws_session_token_name}
           existing_cluster_id: ${var.cluster_id}
         - task_key: gold_products
           depends_on:
@@ -82,6 +98,10 @@ resources:
               catalog: ${var.catalog}
               schema: ${var.schema}
               bucket: ${var.s3_bucket}
+              aws_secret_scope: ${var.aws_secret_scope}
+              aws_access_key_name: ${var.aws_access_key_name}
+              aws_secret_key_name: ${var.aws_secret_key_name}
+              aws_session_token_name: ${var.aws_session_token_name}
           existing_cluster_id: ${var.cluster_id}
         - task_key: silver_orders
           depends_on:
@@ -93,6 +113,10 @@ resources:
               catalog: ${var.catalog}
               schema: ${var.schema}
               bucket: ${var.s3_bucket}
+              aws_secret_scope: ${var.aws_secret_scope}
+              aws_access_key_name: ${var.aws_access_key_name}
+              aws_secret_key_name: ${var.aws_secret_key_name}
+              aws_session_token_name: ${var.aws_session_token_name}
           existing_cluster_id: ${var.cluster_id}
         - task_key: gold_orders
           depends_on:
