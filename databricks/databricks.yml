@@ -4,6 +4,12 @@ bundle:
 include:
   - workflows/workflows.yml
 
+artifacts:
+  default:
+    path: ./
+    files:
+      - source: notebooks/*.py
+
 variables:
   cluster_id:
     description: Existing Databricks cluster id for job tasks
