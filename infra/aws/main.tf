@@ -31,6 +31,25 @@ locals {
   redshift_enabled = var.enable_redshift || var.enable_redshift_serverless
 
   redshift_jdbc_url = local.redshift_enabled ? (var.enable_redshift_serverless ? "jdbc:redshift://${try(aws_redshiftserverless_workgroup.redshift[0].endpoint[0].address, "")}:5439/${var.redshift_database}" : "jdbc:redshift://${try(aws_redshift_cluster.redshift[0].endpoint, "")}:5439/${var.redshift_database}") : ""
+
+  datalake_source_bucket_name   = var.datalake_source_bucket != "" ? var.datalake_source_bucket : aws_s3_bucket.dms.bucket
+  datalake_source_bucket_is_dms = local.datalake_source_bucket_name == aws_s3_bucket.dms.bucket
+  enable_lambda_notifications   = var.enable_step_function && var.enable_datalake_notifications
+  enable_lambda_on_dms_bucket   = local.enable_lambda_notifications && local.datalake_source_bucket_is_dms
+
+  raw_table_locations = {
+    customers   = "s3://${aws_s3_bucket.dms.bucket}/dms/sales/customers/"
+    products    = "s3://${aws_s3_bucket.dms.bucket}/dms/sales/products/"
+    orders      = "s3://${aws_s3_bucket.dms.bucket}/dms/sales/orders/"
+    order_items = "s3://${aws_s3_bucket.dms.bucket}/dms/sales/order_items/"
+  }
+
+  bronze_table_locations = {
+    customers   = "s3://${aws_s3_bucket.dms.bucket}/${var.raw_prefix}/customers/"
+    products    = "s3://${aws_s3_bucket.dms.bucket}/${var.raw_prefix}/products/"
+    orders      = "s3://${aws_s3_bucket.dms.bucket}/${var.raw_prefix}/orders/"
+    order_items = "s3://${aws_s3_bucket.dms.bucket}/${var.raw_prefix}/order_items/"
+  }
 }
 
 resource "aws_s3_bucket" "dms" {
@@ -65,9 +84,10 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "dms" {
   }
 }
 
-resource "aws_s3_bucket_notification" "snowpipe" {
-  count  = length(var.snowpipe_sqs_queue_arns) > 0 ? 1 : 0
+resource "aws_s3_bucket_notification" "dms_notifications" {
+  count  = length(var.snowpipe_sqs_queue_arns) > 0 || local.enable_lambda_on_dms_bucket ? 1 : 0
   bucket = aws_s3_bucket.dms.id
+  eventbridge = local.enable_lambda_on_dms_bucket
 
   dynamic "queue" {
     for_each = var.snowpipe_sqs_queue_arns
@@ -444,6 +464,21 @@ resource "aws_iam_role_policy" "glue_s3" {
           aws_s3_bucket.dms.arn,
           "${aws_s3_bucket.dms.arn}/*"
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:GetObjectVersion",
+          "s3:ListBucket",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:AbortMultipartUpload"
+        ]
+        Resource = [
+          "arn:aws:s3:::analytics-curated",
+          "arn:aws:s3:::analytics-curated/*"
+        ]
       }
     ]
   })
@@ -725,12 +760,14 @@ resource "aws_glue_job" "silver_customers" {
   timeout            = var.glue_timeout_minutes
 
   default_arguments = {
-    "--job-language"            = "python"
-    "--enable-glue-datacatalog" = "true"
-    "--TempDir"                 = "s3://${aws_s3_bucket.dms.bucket}/glue/tmp/"
-    "--S3_BUCKET"               = aws_s3_bucket.dms.bucket
-    "--RAW_PREFIX"              = var.raw_prefix
-    "--SILVER_PREFIX"           = var.silver_prefix
+    "--job-language"               = "python"
+    "--enable-glue-datacatalog"    = "true"
+    "--TempDir"                    = "s3://${aws_s3_bucket.dms.bucket}/glue/tmp/"
+    "--additional-python-modules"  = "pydeequ==1.2.0"
+    "--conf"                       = "spark.jars.packages=com.amazon.deequ:deequ:2.0.7-spark-3.3"
+    "--S3_BUCKET"                  = aws_s3_bucket.dms.bucket
+    "--RAW_PREFIX"                 = var.raw_prefix
+    "--SILVER_PREFIX"              = var.silver_prefix
   }
 }
 
@@ -751,12 +788,14 @@ resource "aws_glue_job" "silver_products" {
   timeout            = var.glue_timeout_minutes
 
   default_arguments = {
-    "--job-language"            = "python"
-    "--enable-glue-datacatalog" = "true"
-    "--TempDir"                 = "s3://${aws_s3_bucket.dms.bucket}/glue/tmp/"
-    "--S3_BUCKET"               = aws_s3_bucket.dms.bucket
-    "--RAW_PREFIX"              = var.raw_prefix
-    "--SILVER_PREFIX"           = var.silver_prefix
+    "--job-language"               = "python"
+    "--enable-glue-datacatalog"    = "true"
+    "--TempDir"                    = "s3://${aws_s3_bucket.dms.bucket}/glue/tmp/"
+    "--additional-python-modules"  = "pydeequ==1.2.0"
+    "--conf"                       = "spark.jars.packages=com.amazon.deequ:deequ:2.0.7-spark-3.3"
+    "--S3_BUCKET"                  = aws_s3_bucket.dms.bucket
+    "--RAW_PREFIX"                 = var.raw_prefix
+    "--SILVER_PREFIX"              = var.silver_prefix
   }
 }
 
@@ -777,12 +816,14 @@ resource "aws_glue_job" "silver_orders" {
   timeout            = var.glue_timeout_minutes
 
   default_arguments = {
-    "--job-language"            = "python"
-    "--enable-glue-datacatalog" = "true"
-    "--TempDir"                 = "s3://${aws_s3_bucket.dms.bucket}/glue/tmp/"
-    "--S3_BUCKET"               = aws_s3_bucket.dms.bucket
-    "--RAW_PREFIX"              = var.raw_prefix
-    "--SILVER_PREFIX"           = var.silver_prefix
+    "--job-language"               = "python"
+    "--enable-glue-datacatalog"    = "true"
+    "--TempDir"                    = "s3://${aws_s3_bucket.dms.bucket}/glue/tmp/"
+    "--additional-python-modules"  = "pydeequ==1.2.0"
+    "--conf"                       = "spark.jars.packages=com.amazon.deequ:deequ:2.0.7-spark-3.3"
+    "--S3_BUCKET"                  = aws_s3_bucket.dms.bucket
+    "--RAW_PREFIX"                 = var.raw_prefix
+    "--SILVER_PREFIX"              = var.silver_prefix
   }
 }
 
@@ -912,54 +953,473 @@ resource "aws_glue_catalog_database" "gold" {
 }
 
 resource "aws_glue_crawler" "raw" {
-  count         = var.enable_glue_athena ? 1 : 0
-  name          = var.glue_crawler_raw_name
-  role          = aws_iam_role.glue[0].arn
+  count = 0
+  name  = var.glue_crawler_raw_name
+  role  = aws_iam_role.glue[0].arn
   database_name = aws_glue_catalog_database.raw[0].name
 
   s3_target {
     path = "s3://${aws_s3_bucket.dms.bucket}/dms/"
-    exclusions = [
-      "**/awsdms_*"
-    ]
   }
-
-  schema_change_policy {
-    update_behavior = "UPDATE_IN_DATABASE"
-    delete_behavior = "LOG"
-  }
-
-  configuration = jsonencode({
-    Version = 1.0
-    Grouping = {
-      TableLevelConfiguration = 2
-      TableGroupingPolicy     = "CombineCompatibleSchemas"
-    }
-  })
 }
 
 resource "aws_glue_crawler" "bronze" {
-  count         = var.enable_glue_athena ? 1 : 0
-  name          = var.glue_crawler_bronze_name
-  role          = aws_iam_role.glue[0].arn
+  count = 0
+  name  = var.glue_crawler_bronze_name
+  role  = aws_iam_role.glue[0].arn
   database_name = aws_glue_catalog_database.bronze[0].name
 
   s3_target {
     path = "s3://${aws_s3_bucket.dms.bucket}/${var.raw_prefix}/"
   }
+}
 
-  schema_change_policy {
-    update_behavior = "UPDATE_IN_DATABASE"
-    delete_behavior = "LOG"
+resource "aws_glue_catalog_table" "raw_customers" {
+  count         = var.enable_glue_athena ? 1 : 0
+  name          = "customers"
+  database_name = aws_glue_catalog_database.raw[0].name
+  table_type    = "EXTERNAL_TABLE"
+  parameters = {
+    EXTERNAL       = "TRUE"
+    classification = "parquet"
   }
 
-  configuration = jsonencode({
-    Version = 1.0
-    Grouping = {
-      TableLevelConfiguration = 2
-      TableGroupingPolicy     = "CombineCompatibleSchemas"
+  storage_descriptor {
+    location      = local.raw_table_locations.customers
+    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+
+    ser_de_info {
+      name                  = "parquet"
+      serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
     }
-  })
+
+    columns {
+      name = "op"
+      type = "string"
+    }
+    columns {
+      name = "dms_commit_ts"
+      type = "string"
+    }
+    columns {
+      name = "customer_id"
+      type = "bigint"
+    }
+    columns {
+      name = "first_name"
+      type = "string"
+    }
+    columns {
+      name = "last_name"
+      type = "string"
+    }
+    columns {
+      name = "email"
+      type = "string"
+    }
+    columns {
+      name = "created_at"
+      type = "timestamp"
+    }
+    columns {
+      name = "updated_at"
+      type = "timestamp"
+    }
+  }
+}
+
+resource "aws_glue_catalog_table" "raw_products" {
+  count         = var.enable_glue_athena ? 1 : 0
+  name          = "products"
+  database_name = aws_glue_catalog_database.raw[0].name
+  table_type    = "EXTERNAL_TABLE"
+  parameters = {
+    EXTERNAL       = "TRUE"
+    classification = "parquet"
+  }
+
+  storage_descriptor {
+    location      = local.raw_table_locations.products
+    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+
+    ser_de_info {
+      name                  = "parquet"
+      serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+    }
+
+    columns {
+      name = "op"
+      type = "string"
+    }
+    columns {
+      name = "dms_commit_ts"
+      type = "string"
+    }
+    columns {
+      name = "product_id"
+      type = "bigint"
+    }
+    columns {
+      name = "sku"
+      type = "string"
+    }
+    columns {
+      name = "product_name"
+      type = "string"
+    }
+    columns {
+      name = "category"
+      type = "string"
+    }
+    columns {
+      name = "price"
+      type = "double"
+    }
+    columns {
+      name = "created_at"
+      type = "timestamp"
+    }
+    columns {
+      name = "updated_at"
+      type = "timestamp"
+    }
+  }
+}
+
+resource "aws_glue_catalog_table" "raw_orders" {
+  count         = var.enable_glue_athena ? 1 : 0
+  name          = "orders"
+  database_name = aws_glue_catalog_database.raw[0].name
+  table_type    = "EXTERNAL_TABLE"
+  parameters = {
+    EXTERNAL       = "TRUE"
+    classification = "parquet"
+  }
+
+  storage_descriptor {
+    location      = local.raw_table_locations.orders
+    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+
+    ser_de_info {
+      name                  = "parquet"
+      serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+    }
+
+    columns {
+      name = "op"
+      type = "string"
+    }
+    columns {
+      name = "dms_commit_ts"
+      type = "string"
+    }
+    columns {
+      name = "order_id"
+      type = "bigint"
+    }
+    columns {
+      name = "customer_id"
+      type = "bigint"
+    }
+    columns {
+      name = "order_status"
+      type = "string"
+    }
+    columns {
+      name = "order_date"
+      type = "timestamp"
+    }
+    columns {
+      name = "updated_at"
+      type = "timestamp"
+    }
+  }
+}
+
+resource "aws_glue_catalog_table" "raw_order_items" {
+  count         = var.enable_glue_athena ? 1 : 0
+  name          = "order_items"
+  database_name = aws_glue_catalog_database.raw[0].name
+  table_type    = "EXTERNAL_TABLE"
+  parameters = {
+    EXTERNAL       = "TRUE"
+    classification = "parquet"
+  }
+
+  storage_descriptor {
+    location      = local.raw_table_locations.order_items
+    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+
+    ser_de_info {
+      name                  = "parquet"
+      serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+    }
+
+    columns {
+      name = "op"
+      type = "string"
+    }
+    columns {
+      name = "dms_commit_ts"
+      type = "string"
+    }
+    columns {
+      name = "order_item_id"
+      type = "bigint"
+    }
+    columns {
+      name = "order_id"
+      type = "bigint"
+    }
+    columns {
+      name = "product_id"
+      type = "bigint"
+    }
+    columns {
+      name = "quantity"
+      type = "int"
+    }
+    columns {
+      name = "unit_price"
+      type = "double"
+    }
+    columns {
+      name = "created_at"
+      type = "timestamp"
+    }
+    columns {
+      name = "updated_at"
+      type = "timestamp"
+    }
+  }
+}
+
+resource "aws_glue_catalog_table" "bronze_customers" {
+  count         = var.enable_glue_athena ? 1 : 0
+  name          = "customers"
+  database_name = aws_glue_catalog_database.bronze[0].name
+  table_type    = "EXTERNAL_TABLE"
+  parameters = {
+    EXTERNAL       = "TRUE"
+    classification = "parquet"
+  }
+
+  storage_descriptor {
+    location      = local.bronze_table_locations.customers
+    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+
+    ser_de_info {
+      name                  = "parquet"
+      serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+    }
+
+    columns {
+      name = "op"
+      type = "string"
+    }
+    columns {
+      name = "dms_commit_ts"
+      type = "string"
+    }
+    columns {
+      name = "customer_id"
+      type = "bigint"
+    }
+    columns {
+      name = "first_name"
+      type = "string"
+    }
+    columns {
+      name = "last_name"
+      type = "string"
+    }
+    columns {
+      name = "email"
+      type = "string"
+    }
+    columns {
+      name = "created_at"
+      type = "timestamp"
+    }
+    columns {
+      name = "updated_at"
+      type = "timestamp"
+    }
+  }
+}
+
+resource "aws_glue_catalog_table" "bronze_products" {
+  count         = var.enable_glue_athena ? 1 : 0
+  name          = "products"
+  database_name = aws_glue_catalog_database.bronze[0].name
+  table_type    = "EXTERNAL_TABLE"
+  parameters = {
+    EXTERNAL       = "TRUE"
+    classification = "parquet"
+  }
+
+  storage_descriptor {
+    location      = local.bronze_table_locations.products
+    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+
+    ser_de_info {
+      name                  = "parquet"
+      serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+    }
+
+    columns {
+      name = "op"
+      type = "string"
+    }
+    columns {
+      name = "dms_commit_ts"
+      type = "string"
+    }
+    columns {
+      name = "product_id"
+      type = "bigint"
+    }
+    columns {
+      name = "sku"
+      type = "string"
+    }
+    columns {
+      name = "product_name"
+      type = "string"
+    }
+    columns {
+      name = "category"
+      type = "string"
+    }
+    columns {
+      name = "price"
+      type = "double"
+    }
+    columns {
+      name = "created_at"
+      type = "timestamp"
+    }
+    columns {
+      name = "updated_at"
+      type = "timestamp"
+    }
+  }
+}
+
+resource "aws_glue_catalog_table" "bronze_orders" {
+  count         = var.enable_glue_athena ? 1 : 0
+  name          = "orders"
+  database_name = aws_glue_catalog_database.bronze[0].name
+  table_type    = "EXTERNAL_TABLE"
+  parameters = {
+    EXTERNAL       = "TRUE"
+    classification = "parquet"
+  }
+
+  storage_descriptor {
+    location      = local.bronze_table_locations.orders
+    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+
+    ser_de_info {
+      name                  = "parquet"
+      serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+    }
+
+    columns {
+      name = "op"
+      type = "string"
+    }
+    columns {
+      name = "dms_commit_ts"
+      type = "string"
+    }
+    columns {
+      name = "order_id"
+      type = "bigint"
+    }
+    columns {
+      name = "customer_id"
+      type = "bigint"
+    }
+    columns {
+      name = "order_status"
+      type = "string"
+    }
+    columns {
+      name = "order_date"
+      type = "timestamp"
+    }
+    columns {
+      name = "updated_at"
+      type = "timestamp"
+    }
+  }
+}
+
+resource "aws_glue_catalog_table" "bronze_order_items" {
+  count         = var.enable_glue_athena ? 1 : 0
+  name          = "order_items"
+  database_name = aws_glue_catalog_database.bronze[0].name
+  table_type    = "EXTERNAL_TABLE"
+  parameters = {
+    EXTERNAL       = "TRUE"
+    classification = "parquet"
+  }
+
+  storage_descriptor {
+    location      = local.bronze_table_locations.order_items
+    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+
+    ser_de_info {
+      name                  = "parquet"
+      serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+    }
+
+    columns {
+      name = "op"
+      type = "string"
+    }
+    columns {
+      name = "dms_commit_ts"
+      type = "string"
+    }
+    columns {
+      name = "order_item_id"
+      type = "bigint"
+    }
+    columns {
+      name = "order_id"
+      type = "bigint"
+    }
+    columns {
+      name = "product_id"
+      type = "bigint"
+    }
+    columns {
+      name = "quantity"
+      type = "int"
+    }
+    columns {
+      name = "unit_price"
+      type = "double"
+    }
+    columns {
+      name = "created_at"
+      type = "timestamp"
+    }
+    columns {
+      name = "updated_at"
+      type = "timestamp"
+    }
+  }
 }
 
 resource "aws_glue_crawler" "silver" {
@@ -1103,17 +1563,17 @@ resource "aws_lambda_function" "step_trigger" {
 }
 
 resource "aws_lambda_permission" "allow_s3_step_trigger" {
-  count         = var.enable_step_function && var.enable_datalake_notifications ? 1 : 0
+  count         = local.enable_lambda_notifications && !local.datalake_source_bucket_is_dms ? 1 : 0
   statement_id  = "AllowS3Invoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.step_trigger[0].function_name
   principal     = "s3.amazonaws.com"
-  source_arn    = "arn:aws:s3:::${var.datalake_source_bucket}"
+  source_arn    = "arn:aws:s3:::${local.datalake_source_bucket_name}"
 }
 
 resource "aws_s3_bucket_notification" "datalake_ingest" {
-  count  = var.enable_step_function && var.enable_datalake_notifications ? 1 : 0
-  bucket = var.datalake_source_bucket
+  count  = local.enable_lambda_notifications && !local.datalake_source_bucket_is_dms ? 1 : 0
+  bucket = local.datalake_source_bucket_name
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.step_trigger[0].arn
@@ -1122,6 +1582,45 @@ resource "aws_s3_bucket_notification" "datalake_ingest" {
   }
 
   depends_on = [aws_lambda_permission.allow_s3_step_trigger]
+}
+
+resource "aws_cloudwatch_event_rule" "dms_object_created" {
+  count = local.enable_lambda_on_dms_bucket ? 1 : 0
+  name  = "${var.project_name}-${var.environment}-dms-object-created"
+
+  event_pattern = jsonencode({
+    source      = ["aws.s3"]
+    "detail-type" = ["Object Created"]
+    detail = {
+      bucket = {
+        name = [aws_s3_bucket.dms.bucket]
+      }
+      object = {
+        key = [
+          {
+            prefix = var.datalake_source_prefix
+          }
+        ]
+      }
+    }
+  })
+}
+
+resource "aws_lambda_permission" "allow_events_step_trigger" {
+  count         = local.enable_lambda_on_dms_bucket ? 1 : 0
+  statement_id  = "AllowEventBridgeInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.step_trigger[0].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.dms_object_created[0].arn
+}
+
+resource "aws_cloudwatch_event_target" "dms_object_created" {
+  count = local.enable_lambda_on_dms_bucket ? 1 : 0
+  rule  = aws_cloudwatch_event_rule.dms_object_created[0].name
+  arn   = aws_lambda_function.step_trigger[0].arn
+
+  depends_on = [aws_lambda_permission.allow_events_step_trigger]
 }
 
 resource "aws_iam_role" "step_function" {
@@ -1171,8 +1670,6 @@ resource "aws_iam_role_policy" "step_function" {
           "glue:StartCrawler"
         ]
         Resource = [
-          aws_glue_crawler.raw[0].arn,
-          aws_glue_crawler.bronze[0].arn,
           aws_glue_crawler.silver[0].arn,
           aws_glue_crawler.gold[0].arn
         ]
@@ -1187,7 +1684,7 @@ resource "aws_sfn_state_machine" "datalake_orchestrator" {
   role_arn = aws_iam_role.step_function[0].arn
 
   definition = jsonencode({
-    Comment = "Glue raw -> Crawler raw -> Silver -> Crawler silver -> Gold -> Crawler gold"
+    Comment = "Glue raw -> Silver -> Crawler silver -> Gold -> Crawler gold"
     StartAt = "RawIngest"
     States = {
       RawIngest = {
@@ -1195,14 +1692,6 @@ resource "aws_sfn_state_machine" "datalake_orchestrator" {
         Resource = "arn:aws:states:::glue:startJobRun.sync"
         Parameters = {
           JobName = aws_glue_job.raw_ingest[0].name
-        }
-        Next = "CrawlerRaw"
-      }
-      CrawlerRaw = {
-        Type = "Task"
-        Resource = "arn:aws:states:::aws-sdk:glue:startCrawler"
-        Parameters = {
-          Name = aws_glue_crawler.bronze[0].name
         }
         Next = "SilverParallel"
       }
@@ -1323,8 +1812,6 @@ resource "aws_sfn_state_machine" "datalake_orchestrator" {
     aws_glue_job.gold_customers,
     aws_glue_job.gold_products,
     aws_glue_job.gold_orders,
-    aws_glue_crawler.raw,
-    aws_glue_crawler.bronze,
     aws_glue_crawler.silver,
     aws_glue_crawler.gold
   ]
