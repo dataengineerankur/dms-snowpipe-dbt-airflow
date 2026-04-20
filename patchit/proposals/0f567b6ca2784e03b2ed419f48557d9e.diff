@@ -1,0 +1,24 @@
+diff --git a/scripts/glue/silver_orders.py b/scripts/glue/silver_orders.py
+index 0ccf347..9b87ab3 100644
+--- a/scripts/glue/silver_orders.py
++++ b/scripts/glue/silver_orders.py
+@@ -19,6 +19,9 @@
+ sc = SparkContext.getOrCreate()
+ glue_context = GlueContext(sc)
+ spark = glue_context.spark_session
++
++spark.conf.set("spark.sql.adaptive.enabled", "true")
++
+ job = Job(glue_context)
+ job.init(args["JOB_NAME"], args)
+ 
+@@ -41,6 +44,9 @@ def dedupe_latest(df, key_col, ts_cols):
+     return df.withColumn("rn", F.row_number().over(w)).filter(F.col("rn") == 1).drop("rn")
+ 
+ 
++orders = read_raw("orders")
++order_items = read_raw("order_items")
++
+ op_col_orders = F.col("dms_op") if "dms_op" in orders.columns else F.col("Op")
+ orders = orders.filter((op_col_orders.isNull()) | (op_col_orders != "D"))
+ orders = dedupe_latest(orders, "order_id", ["dms_commit_ts", "DMS_COMMIT_TS", "updated_at", "order_date"])
