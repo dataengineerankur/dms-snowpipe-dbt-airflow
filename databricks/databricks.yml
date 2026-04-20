@@ -1,6 +1,10 @@
 bundle:
   name: dms-snowpipe-databricks
 
+sync:
+  paths:
+    - notebooks
+
 include:
   - workflows/workflows.yml
 
