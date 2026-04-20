@@ -4,6 +4,7 @@ from airflow import DAG
 
 from dbt_utils import build_dbt_task
 
+bar = None
 
 with DAG(
     dag_id="dbt_pipeline",
