@@ -22,7 +22,7 @@ def _normalize_dbt_command(command: str, add_prefix: bool) -> str:
     return trimmed[len("dbt ") :] if trimmed.startswith("dbt ") else trimmed
 
 
-def build_dbt_task(task_id: str, command: str):
+def build_dbt_task(task_id: str, command: str, retries: int = 0):
     if DBT_EXECUTION_MODE == "ecs":
         ecs_command = _normalize_dbt_command(command, add_prefix=True)
         from airflow.providers.amazon.aws.operators.ecs import EcsRunTaskOperator
@@ -51,6 +51,7 @@ def build_dbt_task(task_id: str, command: str):
                     "assignPublicIp": "ENABLED",
                 }
             },
+            retries=retries,
         )
 
     docker_command = _normalize_dbt_command(command, add_prefix=False)
@@ -64,4 +65,25 @@ def build_dbt_task(task_id: str, command: str):
         network_mode="bridge",
         environment=DEFAULT_ENV,
         mount_tmp_dir=False,
+        retries=retries,
     )
+
+
+def build_dbt_task_group(group_id: str, tasks: list, retries: int = 0):
+    from airflow.utils.task_group import TaskGroup
+
+    with TaskGroup(group_id=group_id) as task_group:
+        task_objects = []
+        for task_config in tasks:
+            if isinstance(task_config, dict):
+                task_id = task_config.get("task_id")
+                command = task_config.get("command")
+                task_retries = task_config.get("retries", retries)
+                if task_id and command:
+                    task_obj = build_dbt_task(task_id, command, retries=task_retries)
+                    task_objects.append(task_obj)
+        
+        for i in range(len(task_objects) - 1):
+            task_objects[i] >> task_objects[i + 1]
+    
+    return task_group
