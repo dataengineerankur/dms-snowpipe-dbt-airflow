@@ -15,6 +15,7 @@ args = getResolvedOptions(
         "JOB_NAME",
         "RAW_PREFIX",
         "SILVER_PREFIX",
+        "S3_BUCKET",
     ],
 )
 
