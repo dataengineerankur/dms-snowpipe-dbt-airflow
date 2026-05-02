@@ -9,6 +9,7 @@ args = getResolvedOptions(
     [
         "JOB_NAME",
         "S3_BUCKET",
+        "S3_SILVER_PREFIX",
         "REDSHIFT_SCHEMA",
         "REDSHIFT_CONNECTION_NAME",
         "TempDir",
@@ -22,6 +23,7 @@ job = Job(glue_context)
 job.init(args["JOB_NAME"], args)
 
 bucket = args["S3_BUCKET"]
+s3_prefix = args["S3_SILVER_PREFIX"]
 schema = args["REDSHIFT_SCHEMA"]
 conn_name = args["REDSHIFT_CONNECTION_NAME"]
 tmp_dir = args["TempDir"]
@@ -62,6 +64,7 @@ TABLES = {
           customer_id BIGINT,
           order_status VARCHAR(32),
           order_date TIMESTAMP,
+          order_amount NUMERIC(12,2),
           updated_at TIMESTAMP,
           dms_op VARCHAR(4),
           dms_commit_ts TIMESTAMPTZ,
@@ -87,7 +90,7 @@ TABLES = {
 }
 
 for table, ddl in TABLES.items():
-    s3_path = f"s3://{bucket}/dms/sales/{table}/"
+    s3_path = f"s3://{bucket}/{s3_prefix}/sales/{table}/"
     df = spark.read.parquet(s3_path)
     dyf = glue_context.create_dynamic_frame.from_df(df, glue_context, table)
 
