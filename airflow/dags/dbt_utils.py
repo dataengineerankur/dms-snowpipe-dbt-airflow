@@ -1,6 +1,7 @@
 import os
 
 from airflow.providers.docker.operators.docker import DockerOperator
+from airflow.utils.task_group import TaskGroup
 
 DBT_EXECUTION_MODE = os.getenv("DBT_EXECUTION_MODE", "local").lower()
 
@@ -65,3 +66,59 @@ def build_dbt_task(task_id: str, command: str):
         environment=DEFAULT_ENV,
         mount_tmp_dir=False,
     )
+
+
+def build_dbt_task_group(group_id: str, commands: list[tuple[str, str]], retries: int = 2):
+    with TaskGroup(group_id=group_id) as task_group:
+        tasks = []
+        for task_id, command in commands:
+            if DBT_EXECUTION_MODE == "ecs":
+                ecs_command = _normalize_dbt_command(command, add_prefix=True)
+                from airflow.providers.amazon.aws.operators.ecs import EcsRunTaskOperator
+
+                subnets = [s for s in os.getenv("ECS_SUBNETS", "").split(",") if s]
+                security_groups = [s for s in os.getenv("ECS_SECURITY_GROUPS", "").split(",") if s]
+
+                task = EcsRunTaskOperator(
+                    task_id=task_id,
+                    cluster=os.getenv("ECS_CLUSTER_ARN", ""),
+                    task_definition=os.getenv("ECS_TASK_DEFINITION_ARN", ""),
+                    launch_type="FARGATE",
+                    overrides={
+                        "containerOverrides": [
+                            {
+                                "name": "dbt",
+                                "command": ["/bin/bash", "-lc", ecs_command],
+                                "environment": [{"name": k, "value": v} for k, v in DEFAULT_ENV.items()],
+                            }
+                        ]
+                    },
+                    network_configuration={
+                        "awsvpcConfiguration": {
+                            "subnets": subnets,
+                            "securityGroups": security_groups,
+                            "assignPublicIp": "ENABLED",
+                        }
+                    },
+                    retries=retries,
+                )
+            else:
+                docker_command = _normalize_dbt_command(command, add_prefix=False)
+                task = DockerOperator(
+                    task_id=task_id,
+                    image=os.getenv("DBT_IMAGE", "dms-dbt-runner:latest"),
+                    api_version="auto",
+                    auto_remove=True,
+                    command=docker_command,
+                    docker_url=os.getenv("DOCKER_HOST", "tcp://docker-proxy:2375"),
+                    network_mode="bridge",
+                    environment=DEFAULT_ENV,
+                    mount_tmp_dir=False,
+                    retries=retries,
+                )
+            tasks.append(task)
+        
+        for i in range(len(tasks) - 1):
+            tasks[i] >> tasks[i + 1]
+        
+    return task_group
