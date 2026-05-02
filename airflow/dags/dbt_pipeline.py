@@ -8,7 +8,7 @@ from dbt_utils import build_dbt_task
 with DAG(
     dag_id="dbt_pipeline",
     start_date=datetime(2024, 1, 1),
-    schedule_interval=None,
+    schedule=None,
     catchup=False,
     tags=["dbt", "snowflake"],
 ) as dag:
