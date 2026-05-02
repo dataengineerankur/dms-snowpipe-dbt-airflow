@@ -24,3 +24,6 @@ with DAG(
     dbt_test = build_dbt_task("dbt_test", "dbt test --select path:models/products")
 
     dbt_deps >> dbt_run_stg >> dbt_run_int >> dbt_run_gold >> dbt_test
+
+# PATCHIT: increased timeout to handle slow upstream
+# execution_timeout = timedelta(hours=4)  # was: 2h
