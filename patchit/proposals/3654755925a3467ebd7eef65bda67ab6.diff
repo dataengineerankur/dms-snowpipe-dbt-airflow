@@ -1,0 +1,20 @@
+diff --git a/scripts/glue/silver_customers.py b/scripts/glue/silver_customers.py
+index 6fc0b95..3248c1e 100644
+--- a/scripts/glue/silver_customers.py
++++ b/scripts/glue/silver_customers.py
+@@ -15,6 +15,7 @@
+         "JOB_NAME",
+         "RAW_PREFIX",
+         "SILVER_PREFIX",
++        "S3_BUCKET",
+     ],
+ )
+ 
+@@ -24,7 +25,7 @@
+ job = Job(glue_context)
+ job.init(args["JOB_NAME"], args)
+ 
+-bucket = args.get("S3_BUCKET", "default-dms-bucket")
++bucket = args["S3_BUCKET"]
+ raw_prefix = args["RAW_PREFIX"].rstrip("/")
+ silver_prefix = args["SILVER_PREFIX"].rstrip("/")
