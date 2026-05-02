@@ -19,6 +19,9 @@ args = getResolvedOptions(
 sc = SparkContext.getOrCreate()
 glue_context = GlueContext(sc)
 spark = glue_context.spark_session
+
+spark.conf.set("spark.sql.adaptive.enabled", "true")
+
 job = Job(glue_context)
 job.init(args["JOB_NAME"], args)
 
@@ -40,6 +43,9 @@ def dedupe_latest(df, key_col, ts_cols):
     w = Window.partitionBy(key_col).orderBy(*order_cols)
     return df.withColumn("rn", F.row_number().over(w)).filter(F.col("rn") == 1).drop("rn")
 
+
+orders = read_raw("orders")
+order_items = read_raw("order_items")
 
 op_col_orders = F.col("dms_op") if "dms_op" in orders.columns else F.col("Op")
 orders = orders.filter((op_col_orders.isNull()) | (op_col_orders != "D"))
