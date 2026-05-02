@@ -104,3 +104,16 @@ resources:
               catalog: ${var.catalog}
               schema: ${var.schema}
           existing_cluster_id: ${var.cluster_id}
+
+    sessions_gold_pipeline:
+      name: dbx_sessions_gold_pipeline
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: notebook_transform
+          notebook_task:
+            notebook_path: ${workspace.file_path}/notebooks/sessions_events_transform.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema: ${var.schema}
+              bucket: ${var.s3_bucket}
+          existing_cluster_id: ${var.cluster_id}
