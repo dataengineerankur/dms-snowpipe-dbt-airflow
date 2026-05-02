@@ -1,0 +1,34 @@
+-- MERGE orders from STAGING to ANALYTICS with deduplication
+-- Fix: Added QUALIFY ROW_NUMBER() to deduplicate source rows before MERGE
+
+MERGE INTO ANALYTICS.ORDERS_DEDUP AS target
+USING (
+  SELECT *
+  FROM STAGING.ORDERS
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY ORDER_ID ORDER BY UPDATED_AT DESC) = 1
+) AS src
+ON target.ORDER_ID = src.ORDER_ID
+WHEN MATCHED THEN
+  UPDATE SET
+    target.CUSTOMER_ID = src.CUSTOMER_ID,
+    target.ORDER_DATE = src.ORDER_DATE,
+    target.ORDER_STATUS = src.ORDER_STATUS,
+    target.ORDER_TOTAL = src.ORDER_TOTAL,
+    target.UPDATED_AT = src.UPDATED_AT
+WHEN NOT MATCHED THEN
+  INSERT (
+    ORDER_ID,
+    CUSTOMER_ID,
+    ORDER_DATE,
+    ORDER_STATUS,
+    ORDER_TOTAL,
+    UPDATED_AT
+  )
+  VALUES (
+    src.ORDER_ID,
+    src.CUSTOMER_ID,
+    src.ORDER_DATE,
+    src.ORDER_STATUS,
+    src.ORDER_TOTAL,
+    src.UPDATED_AT
+  );
