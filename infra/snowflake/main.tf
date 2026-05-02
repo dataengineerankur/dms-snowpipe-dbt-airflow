@@ -6,8 +6,10 @@ locals {
   gold_schema     = "GOLD"
   ingest_role     = "INGEST_ROLE"
   transform_role  = "TRANSFORM_ROLE"
+  loader_role     = "LOADER_ROLE"
   ingest_wh       = "INGEST_WH"
   transform_wh    = "TRANSFORM_WH"
+  compute_wh      = "COMPUTE_WH"
   stage_name      = "DMS_STAGE"
   file_format     = "DMS_PARQUET_FF"
   storage_integ   = "S3_DMS_INT"
@@ -53,12 +55,24 @@ resource "snowflake_warehouse" "transform" {
   initially_suspended = true
 }
 
+resource "snowflake_warehouse" "compute" {
+  name                = local.compute_wh
+  warehouse_size      = "XSMALL"
+  auto_suspend        = 60
+  auto_resume         = true
+  initially_suspended = true
+}
+
 resource "snowflake_role" "ingest" {
   name = local.ingest_role
 }
 
 resource "snowflake_role" "transform" {
   name = local.transform_role
+}
+
+resource "snowflake_role" "loader" {
+  name = local.loader_role
 }
 
 resource "snowflake_database_grant" "db_usage_ingest" {
@@ -118,6 +132,12 @@ resource "snowflake_warehouse_grant" "transform_wh_usage" {
   warehouse_name = snowflake_warehouse.transform.name
   privilege      = "USAGE"
   roles          = [snowflake_role.transform.name]
+}
+
+resource "snowflake_warehouse_grant" "compute_wh_usage_loader" {
+  warehouse_name = snowflake_warehouse.compute.name
+  privilege      = "USAGE"
+  roles          = [snowflake_role.loader.name]
 }
 
 resource "snowflake_storage_integration" "s3" {
