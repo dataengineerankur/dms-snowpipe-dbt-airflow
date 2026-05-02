@@ -259,7 +259,7 @@ def main() -> int:
             "aws_region": args.region,
             "state_machine_arn": state_machine_arn,
             "execution_arn": execution_arn,
-            "glue_job_name": job_name,
+            "glue_job_namez": job_name,
             "glue_job_run_id": job_run_id,
             "glue_job_state": glue_state,
             "glue_job_error": glue_error,
