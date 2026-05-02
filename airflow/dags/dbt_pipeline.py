@@ -14,8 +14,10 @@ with DAG(
 ) as dag:
     dbt_deps = build_dbt_task("dbt_deps", "dbt deps")
     dbt_run_stg = build_dbt_task("dbt_run_stg", "dbt run --select stg")
+    dbt_test_stg = build_dbt_task("dbt_test_stg", "dbt test --select stg")
     dbt_run_int = build_dbt_task("dbt_run_int", "dbt run --select int")
+    dbt_test_int = build_dbt_task("dbt_test_int", "dbt test --select int")
     dbt_run_gold = build_dbt_task("dbt_run_gold", "dbt run --select gold")
     dbt_test = build_dbt_task("dbt_test", "dbt test --select gold")
 
-    dbt_deps >> dbt_run_stg >> dbt_run_int >> dbt_run_gold >> dbt_test
+    dbt_deps >> dbt_run_stg >> dbt_test_stg >> dbt_run_int >> dbt_test_int >> dbt_run_gold >> dbt_test
