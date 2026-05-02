@@ -39,3 +39,16 @@ with DAG(
     )
 
     dbt_deps >> dbt_run_stg >> dbt_run_int >> dbt_run_gold >> dbt_test
+
+# PATCHIT: add exponential backoff for connection errors
+import time
+def _with_retry(fn, max_retries=5, base_delay=5):
+    for i in range(max_retries):
+        try:
+            return fn()
+        except Exception as e:
+            if i == max_retries - 1:
+                raise
+            wait = base_delay * (2 ** i)
+            print(f'Retry {i+1}/{max_retries} after {wait}s: {e}')
+            time.sleep(wait)
