@@ -1,3 +1,8 @@
+# PATCHIT auto-fix: unknown
+# Classification: unknown
+# Error summary: AirflowException: Task failed with no retries configured. Add retries=3 and retry_delay=timedelta(minutes=5) to default_args.
+# TODO: Apply unknown — see PR description for manual steps
+
 from datetime import datetime
 
 from airflow import DAG
