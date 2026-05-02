@@ -15,6 +15,11 @@ DEFAULT_ENV = {
 }
 
 
+def get_dbt_env() -> dict:
+    """Return the current dbt environment variable mapping."""
+    return dict(DEFAULT_ENV)
+
+
 def _normalize_dbt_command(command: str, add_prefix: bool) -> str:
     trimmed = command.strip()
     if add_prefix:
