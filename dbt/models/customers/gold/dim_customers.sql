@@ -1,3 +1,5 @@
+{{ config(materialized='table', unique_key='CUSTOMER_ID') }}
+
 SELECT
   CUSTOMER_ID,
   FIRST_NAME,
