@@ -12,6 +12,7 @@ DEFAULT_ENV = {
     "SNOWFLAKE_WAREHOUSE": os.getenv("SNOWFLAKE_WAREHOUSE", "TRANSFORM_WH"),
     "SNOWFLAKE_DATABASE": os.getenv("SNOWFLAKE_DATABASE", "ANALYTICS"),
     "DBT_PROFILES_DIR": "/opt/dbt",
+    "DBT_TARGET": os.getenv("DBT_TARGET", "prod"),
 }
 
 
